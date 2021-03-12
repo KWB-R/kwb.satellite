@@ -147,6 +147,17 @@
 <span id="cb3-24"><a href="#cb3-24"></a>                     <span class="dt">path =</span> export_dir,</span>
 <span id="cb3-25"><a href="#cb3-25"></a>                     <span class="dt">verbose =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <p>Take a break and wait until request is finished this may take a few hours. To check the progress of the request visit: <a href="https://cds.climate.copernicus.eu/cdsapp#!/yourrequests">https://cds.climate.copernicus.eu/cdsapp#!/yourrequests</a></p>
+<div id="load-raster-data" class="section level3">
+<h3 class="hasAnchor">
+<a href="#load-raster-data" class="anchor"></a>6. Load raster data</h3>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="va">grib_file</span> <span class="op">&lt;-</span> <span class="st">"download.grib"</span>
+
+<span class="va">meta</span> <span class="op">&lt;-</span> <span class="fu">kwb.satellite</span><span class="fu">::</span><span class="fu"><a href="../reference/get_metadata_era5.html">get_metadata_era5</a></span><span class="op">(</span><span class="va">grib_file</span><span class="op">)</span>
+
+<span class="va">temperature</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html">raster</a></span><span class="op">(</span><span class="va">grib_file</span><span class="op">)</span></code></pre></div>
+</div>
 </div>
   </div>
 
