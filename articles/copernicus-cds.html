@@ -110,7 +110,7 @@
 <div id="run-ecmwfrwf_set_key" class="section level3">
 <h3 class="hasAnchor">
 <a href="#run-ecmwfrwf_set_key" class="anchor"></a>3. Run ecmwfr::wf_set_key()</h3>
-<p><code>r{ eval = FALSE} ecmwfr::wf_set_key(user = Sys.getenv("COPERNICUS_CLIMATE_UUID"),                    key = Sys.getenv("COPERNICUS_CLIMATE_APIKEY"),                    service = "cds")</code></p>
+<p><code>r{set, eval = FALSE} ecmwfr::wf_set_key(user = Sys.getenv("COPERNICUS_CLIMATE_UUID"),                    key = Sys.getenv("COPERNICUS_CLIMATE_APIKEY"),                    service = "cds")</code></p>
 </div>
 <div id="create-a-query" class="section level3">
 <h3 class="hasAnchor">
@@ -122,7 +122,7 @@
 <div id="run-your-query" class="section level3">
 <h3 class="hasAnchor">
 <a href="#run-your-query" class="anchor"></a>5. Run your query</h3>
-<p>```r{ eval = FALSE}</p>
+<p>```r{run, eval = FALSE}</p>
 <p>variable = “2m_temperature”, dataset_short_name = “reanalysis-era5-single-levels”, product_type = “reanalysis”, years = as.character(seq(2010, 2020)), area = c(40, 116, 39, 117), file_format = “grib” request &lt;- list( product_type = “reanalysis”, file_format = “grib” variable = “2m_temperature”, year = c(“2010”, “2011”, “2012”, “2013”, “2014”, “2015”, “2016”, “2017”, “2018”, “2019”, “2020”), month = c(“01”, “02”, “03”, “04”, “05”, “06”, “07”, “08”, “09”, “10”, “11”, “12”), day = c(“01”, “02”, “03”, “04”, “05”, “06”, “07”, “08”, “09”, “10”, “11”, “12”, “13”, “14”, “15”, “16”, “17”, “18”, “19”, “20”, “21”, “22”, “23”, “24”, “25”, “26”, “27”, “28”, “29”, “30”, “31”), time = c(“00:00”, “01:00”, “02:00”, “03:00”, “04:00”, “05:00”, “06:00”, “07:00”, “08:00”, “09:00”, “10:00”, “11:00”, “12:00”, “13:00”, “14:00”, “15:00”, “16:00”, “17:00”, “18:00”, “19:00”, “20:00”, “21:00”, “22:00”, “23:00”), area = area, dataset_short_name = dataset_short_name, target = sprintf(“%s_%s_%s-%s.%s”, dataset_short_name, variable, min(as.numeric(years)), max(as.numeric(years)), file_format))</p>
 <p>ecmwfr::wf_request(request = request, transfer = TRUE, path = export_dir, verbose = FALSE) ```</p>
 </div>
