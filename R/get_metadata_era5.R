@@ -30,17 +30,21 @@ get_metadata_era5 <- function(grib_file) {
     gdata::startsWith(as.character(grib1[["raw_"]]), what, trim = TRUE)
   }
 
+  is_band <- raw_starts_with('Band')
+  is_grib_c <- raw_starts_with('GRIB_C')
+  is_grib_r <- raw_starts_with('GRIB_R')
+
   grib1 <- grib1 %>%
     dplyr::mutate(
       content = dplyr::case_when(
-        raw_starts_with('Band') ~ gsub(".*Band (.+) Block.*", "\\1", raw_),
-        raw_starts_with('GRIB_C') ~ sub(".*=", "", raw_),
-        raw_starts_with('GRIB_R') ~ gsub(".*= (.+) sec.*", "\\1", raw_)
+        is_band ~ gsub(".*Band (.+) Block.*", "\\1", raw_),
+        is_grib_c ~ sub(".*=", "", raw_),
+        is_grib_r ~ gsub(".*= (.+) sec.*", "\\1", raw_)
       ),
       column = dplyr::case_when(
-        raw_starts_with('Band') ~ 'Band',
-        raw_starts_with('GRIB_C') ~ 'Variable',
-        raw_starts_with('GRIB_R') ~ 'Time'
+        is_band ~ 'Band',
+        is_grib_c ~ 'Variable',
+        is_grib_r ~ 'Time'
       )
     )
 
