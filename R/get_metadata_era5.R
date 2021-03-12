@@ -26,20 +26,23 @@ get_metadata_era5 <- function(grib_file) {
   colnames(grib1) <- c('raw_')
 
   # Clean a little bit (with the help of this post, among others).
+  raw_starts_with <- function(what) {
+    gdata::startsWith(as.character(grib1[["raw_"]]), what, trim = TRUE)
+  }
 
   grib1 <- grib1 %>%
-    dplyr::mutate(content = dplyr::case_when(
-      gdata::startsWith(as.character(raw_), 'Band', trim = TRUE) ~ gsub(".*Band (.+) Block.*", "\\1",raw_),
-      gdata::startsWith(as.character(raw_), 'GRIB_C', trim = TRUE) ~ sub(".*=", "", raw_),
-      gdata::startsWith(as.character(raw_), 'GRIB_R', trim = TRUE) ~ gsub(".*= (.+) sec.*", "\\1",raw_)
-    ))
-
-  grib1 <- grib1 %>%
-    dplyr::mutate(column = dplyr::case_when(
-      gdata::startsWith(as.character(raw_), 'Band', trim = TRUE) ~ 'Band',
-      gdata::startsWith(as.character(raw_), 'GRIB_C', trim = TRUE) ~ 'Variable',
-      gdata::startsWith(as.character(raw_), 'GRIB_R', trim = TRUE) ~ 'Time'
-    ))
+    dplyr::mutate(
+      content = dplyr::case_when(
+        raw_starts_with('Band') ~ gsub(".*Band (.+) Block.*", "\\1", raw_),
+        raw_starts_with('GRIB_C') ~ sub(".*=", "", raw_),
+        raw_starts_with('GRIB_R') ~ gsub(".*= (.+) sec.*", "\\1", raw_)
+      ),
+      column = dplyr::case_when(
+        raw_starts_with('Band') ~ 'Band',
+        raw_starts_with('GRIB_C') ~ 'Variable',
+        raw_starts_with('GRIB_R') ~ 'Time'
+      )
+    )
 
   grib1 <- grib1[, -1]
 
