@@ -137,7 +137,13 @@ defined in parameter "variables" on all machine cores minus one</p>
     <pre class="usage"><span class='fu'>copernicus_cds_parallel</span><span class='op'>(</span>
   variables <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"2m_temperature"</span>, <span class='st'>"evaporation"</span>, <span class='st'>"potential_evaporation"</span>,
     <span class='st'>"precipitation_type"</span>, <span class='st'>"runoff"</span>, <span class='st'>"sub_surface_runoff"</span>, <span class='st'>"surface_runoff"</span>,
-    <span class='st'>"total_precipitation"</span><span class='op'>)</span>
+    <span class='st'>"total_precipitation"</span><span class='op'>)</span>,
+  dataset_short_name <span class='op'>=</span> <span class='st'>"reanalysis-era5-single-levels"</span>,
+  product_type <span class='op'>=</span> <span class='st'>"reanalysis"</span>,
+  years <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>2010</span>, <span class='fl'>2020</span><span class='op'>)</span><span class='op'>)</span>,
+  area <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>40</span>, <span class='fl'>116</span>, <span class='fl'>39</span>, <span class='fl'>117</span><span class='op'>)</span>,
+  file_format <span class='op'>=</span> <span class='st'>"grib"</span>,
+  export_dir <span class='op'>=</span> <span class='st'>"."</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
