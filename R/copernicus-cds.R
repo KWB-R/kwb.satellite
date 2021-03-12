@@ -98,29 +98,27 @@ copernicus_cds_parallel <- function(
   ncores <- parallel::detectCores() - 1
 
   cl <- parallel::makeCluster(ncores)
+  on.exit(parallel::stopCluster(cl))
 
   msg <- sprintf(
     "Importing %d variable(s) (%s) from Copernicus CDS parallel (ncores = %d)",
     length(variables),
-    paste0("'", paste(variables, collapse = "\', \'"), "'"),
+    kwb.utils::stringList(variables),
     ncores
   )
 
   kwb.utils::catAndRun(
     messageText = msg,
-    expr = parallel::parLapply(
-      cl, variables, function(variable) {
-        try(copernicus_cds(
-          variable,
-          dataset_short_name = dataset_short_name ,
-          product_type = product_type,
-          years = years,
-          area = area,
-          file_format = file_format,
-          export_dir = export_dir
-        ))
-      })
+    expr = parallel::parLapply(cl, variables, function(variable) {
+      try(copernicus_cds(
+        variable,
+        dataset_short_name = dataset_short_name ,
+        product_type = product_type,
+        years = years,
+        area = area,
+        file_format = file_format,
+        export_dir = export_dir
+      ))
+    })
   )
-
-  parallel::stopCluster(cl)
 }
