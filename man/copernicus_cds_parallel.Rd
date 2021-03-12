@@ -14,10 +14,23 @@ copernicus_cds_parallel(
 \item{variables}{default: c("2m_temperature", "evaporation", "potential_evaporation",
 "precipitation_type", "runoff", "sub_surface_runoff", "surface_runoff",
 "total_precipitation")}
+
+\item{dataset_short_name}{"reanalysis-era5-single-levels"}
+
+\item{product_type}{default: "reanalysis"}
+
+\item{years}{character vector of years (default:  as.character(seq(2010, 2020)))}
+
+\item{area}{area coordinates in latitude/longitude (default: c(40, 116, 39, 117))}
+
+\item{file_format}{"grib" or "netcdf"}
+
+\item{export_dir}{default: "."}
 }
 \value{
 list with paths to downloaded files
 }
 \description{
-Copernicus Climate Data Store: Multi Query
+Runs \link{\code{copernicus_cds}} in parallel for all variables
+defined in parameter "variables" on all machine cores minus one
 }

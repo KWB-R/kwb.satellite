@@ -59,11 +59,17 @@ copernicus_cds <- function(variable = "2m_temperature",
 
 
 #' Copernicus Climate Data Store: Multi Query
-#'
+#' @description Runs \link{\code{copernicus_cds}} in parallel for all variables
+#' defined in parameter "variables" on all machine cores minus one
 #' @param variables default: c("2m_temperature", "evaporation", "potential_evaporation",
 #' "precipitation_type", "runoff", "sub_surface_runoff", "surface_runoff",
 #' "total_precipitation")
-#'
+#' @param dataset_short_name "reanalysis-era5-single-levels"
+#' @param product_type  default: "reanalysis"
+#' @param years character vector of years (default:  as.character(seq(2010, 2020)))
+#' @param area area coordinates in latitude/longitude (default: c(40, 116, 39, 117))
+#' @param file_format "grib" or "netcdf"
+#' @param export_dir default: "."
 #' @return list with paths to downloaded files
 #' @export
 #' @importFrom kwb.utils catAndRun
@@ -92,7 +98,13 @@ copernicus_cds_parallel <- function(variables = c("2m_temperature",
     messageText = msg,
     expr = parallel::parLapply(
       cl, variables, function(variable) {
-        try(copernicus_cds(variable))
+        try(copernicus_cds(variable,
+                           dataset_short_name = dataset_short_name ,
+                           product_type = product_type,
+                           years = years,
+                           area = area,
+                           file_format = file_format,
+                           export_dir = export_dir))
       })
   )
 
