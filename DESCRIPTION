@@ -24,8 +24,13 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports: 
+    dplyr,
     ecmwfr,
-    kwb.utils
+    gdalUtils,
+    gdata,
+    kwb.utils,
+    maditr,
+    magrittr
 Suggests: 
     covr,
     knitr,
