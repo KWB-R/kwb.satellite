@@ -14,40 +14,38 @@ knitr::opts_chunk$set(
 )
 ```
 
-### 1. Register for CDS services
+## 1. Register for CDS services
 
-https://cds.climate.copernicus.eu/user/register
+[https://cds.climate.copernicus.eu/user/register](https://cds.climate.copernicus.eu/user/register)
 
 
-### 2. Setting Access Rights
+## 2. Setting Access Rights
 
 Copy `UUID` and `API KEY` from:
-https://cds.climate.copernicus.eu/user
+[https://cds.climate.copernicus.eu/user](https://cds.climate.copernicus.eu/user)
 
 Add these to your R environment file by calling `usethis::edit_r_environ()`
-and add the following two key value pairs.
+and add the following two key value pairs in R the environment file:
 
-```r{}
-### 2) Add both in R environement file:
-### "COPERNICUS_CLIMATE_UUID = "myuuid"
-### "COPERNICUS_CLIMATE_APIKEY = "myapikey"
+```{r login, eval = FALSE}
+"COPERNICUS_CLIMATE_UUID" = "myuuid"
+"COPERNICUS_CLIMATE_APIKEY" = "myapikey"
 ```
 
-Restart R(Studio) now!
+Restart R(Studio) now and set your access details as shown below:
 
 
-### 3. Run ecmwfr::wf_set_key()
-
-```r{set, eval = FALSE}
+```{r set, eval = FALSE}
 ecmwfr::wf_set_key(user = Sys.getenv("COPERNICUS_CLIMATE_UUID"),
                    key = Sys.getenv("COPERNICUS_CLIMATE_APIKEY"),
                    service = "cds")
+
 ```
 
 
-### 4. Create a query
+## 4. Create a query
 
-Go to: https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels?tab=form
+Go to: [https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels?tab=form](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels?tab=form)
 
 to create a query. 
 
@@ -57,18 +55,13 @@ https://cran.r-project.org/web/packages/ecmwfr/vignettes/cds_vignette.html for
 details)
 
 
-### 5. Run your query
+## 5. Run your query
 
-```r{run, eval = FALSE}
+```{r run, eval = FALSE}
 
-variable = "2m_temperature",
-                           dataset_short_name = "reanalysis-era5-single-levels",
-                           product_type = "reanalysis",
-                           years = as.character(seq(2010, 2020)),
-                           area = c(40, 116, 39, 117),
-                           file_format = "grib"
 request <- list(
     product_type = "reanalysis",
+    dataset_short_name = "reanalysis-era5-single-levels",
     file_format = "grib"
     variable = "2m_temperature",
     year = c("2010", "2011", "2012", "2013", "2014", 
@@ -82,14 +75,8 @@ request <- list(
              "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00",
              "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00",
              "21:00", "22:00", "23:00"),
-    area = area,
-    dataset_short_name = dataset_short_name,
-    target =  sprintf("%s_%s_%s-%s.%s",
-                      dataset_short_name,
-                      variable,
-                      min(as.numeric(years)),
-                      max(as.numeric(years)),
-                      file_format))
+    area = c(40, 116, 39, 117),
+    target =  "download.grib")
 
 
   ecmwfr::wf_request(request = request,
@@ -97,3 +84,7 @@ request <- list(
                      path = export_dir,
                      verbose = FALSE)
 ```
+
+Take a break and wait until request is finished this may take a few hours. To 
+check the progress of the request visit: 
+[https://cds.climate.copernicus.eu/cdsapp#!/yourrequests](https://cds.climate.copernicus.eu/cdsapp#!/yourrequests)

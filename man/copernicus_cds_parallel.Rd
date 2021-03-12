@@ -7,7 +7,13 @@
 copernicus_cds_parallel(
   variables = c("2m_temperature", "evaporation", "potential_evaporation",
     "precipitation_type", "runoff", "sub_surface_runoff", "surface_runoff",
-    "total_precipitation")
+    "total_precipitation"),
+  dataset_short_name = "reanalysis-era5-single-levels",
+  product_type = "reanalysis",
+  years = as.character(seq(2010, 2020)),
+  area = c(40, 116, 39, 117),
+  file_format = "grib",
+  export_dir = "."
 )
 }
 \arguments{
@@ -31,6 +37,6 @@ copernicus_cds_parallel(
 list with paths to downloaded files
 }
 \description{
-Runs \link{\code{copernicus_cds}} in parallel for all variables
+Runs \code{copernicus_cds} in parallel for all variables
 defined in parameter "variables" on all machine cores minus one
 }

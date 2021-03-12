@@ -59,7 +59,7 @@ copernicus_cds <- function(variable = "2m_temperature",
 
 
 #' Copernicus Climate Data Store: Multi Query
-#' @description Runs \link{\code{copernicus_cds}} in parallel for all variables
+#' @description Runs \code{copernicus_cds} in parallel for all variables
 #' defined in parameter "variables" on all machine cores minus one
 #' @param variables default: c("2m_temperature", "evaporation", "potential_evaporation",
 #' "precipitation_type", "runoff", "sub_surface_runoff", "surface_runoff",
@@ -82,8 +82,13 @@ copernicus_cds_parallel <- function(variables = c("2m_temperature",
                                                   "runoff",
                                                   "sub_surface_runoff",
                                                   "surface_runoff",
-                                                  "total_precipitation")
-) {
+                                                  "total_precipitation"),
+                                    dataset_short_name = "reanalysis-era5-single-levels",
+                                    product_type = "reanalysis",
+                                    years = as.character(seq(2010, 2020)),
+                                    area = c(40, 116, 39, 117),
+                                    file_format = "grib",
+                                    export_dir = ".") {
 
   ncores <- parallel::detectCores() - 1
 
