@@ -29,8 +29,8 @@ Imports:
     gdalUtils,
     gdata,
     kwb.utils,
-    maditr,
-    magrittr
+    magrittr, 
+    tidyr
 Suggests: 
     covr,
     knitr,

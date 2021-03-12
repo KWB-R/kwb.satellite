@@ -5,7 +5,7 @@
 #' @return metadata
 #' @export
 #' @importFrom gdalUtils gdalinfo
-#' @importFrom maditr dcast
+#' @importFrom tidyr pivot_wider
 #' @importFrom gdata startsWith
 #' @importFrom dplyr case_when mutate
 #' @seealso Code taken from https://gis.stackexchange.com/a/360652
@@ -40,15 +40,18 @@ grib1 <- grib1 %>%
     gdata::startsWith	(as.character(raw_),'GRIB_R', trim=TRUE) ~ 'Time'
   )
   )
-grib1<-grib1[,-1]
+grib1 <- grib1[,-1]
 
 #Variables to columns and time readable (as seen here).
 
-grib1$id <- sort(rep(1:72,3))
-grib1 <- maditr::dcast(grib1, formula = id ~ column, value.var='content')
-grib1 <- grib1 %>% dplyr::mutate(
-  Time = as.POSIXct(as.numeric(as.character("Time")), origin="1970-01-01")
-)
+max_id <- nrow(grib1)/3
+
+grib1$id <- sort(rep(1:max_id,3))
+grib1 <- grib1 %>%  tidyr::pivot_wider(names_from = "column",
+                                       values_from = "content") %>%
+  dplyr::mutate(Time = as.POSIXct(as.numeric(Time),
+                                  origin="1970-01-01"))
+
 grib1 <- grib1[,-1]
 
 grib1
