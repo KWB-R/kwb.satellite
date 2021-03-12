@@ -94,8 +94,9 @@ copernicus_cds_parallel <- function(variables = c("2m_temperature",
 
   cl <- parallel::makeCluster(ncores)
 
-  msg <- sprintf("Importing %d variables from Copernicus CDS parallel (ncores = %d)",
+  msg <- sprintf("Importing %d variable(s) (%s) from Copernicus CDS parallel (ncores = %d)",
                  length(variables),
+                 paste0("'", paste(variables, collapse = "\', \'"), "'"),
                  ncores)
 
 
