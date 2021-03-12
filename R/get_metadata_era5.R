@@ -12,47 +12,52 @@
 #'
 get_metadata_era5 <- function(grib_file) {
 
-### Code copied from:
-### https://gis.stackexchange.com/questions/360547/era5-grib-file-how-to-know-what-each-band-means
+  ### Code copied from:
+  ### https://gis.stackexchange.com/questions/360547/era5-grib-file-how-to-know-what-each-band-means
 
-info <- gdalUtils::gdalinfo(grib_file)
+  info <- gdalUtils::gdalinfo(grib_file)
 
-#Filter and retrieve the information of interest (as seen here).
-grib1 <- as.data.frame(info)
-grib1 <- as.data.frame(grib1[grep(pattern = 'Band|GRIB_COMMENT|GRIB_REF_TIME',
-                                  x = info),])
-colnames(grib1) <- c('raw_')
-
-#Clean a little bit (with the help of this post, among others).
-
-grib1 <- grib1 %>%
-  dplyr::mutate(content = dplyr::case_when(
-    gdata::startsWith(as.character(raw_),'Band', trim=TRUE) ~ gsub(".*Band (.+) Block.*", "\\1",raw_),
-    gdata::startsWith(as.character(raw_),'GRIB_C', trim=TRUE) ~ sub(".*=", "", raw_),
-    gdata::startsWith(as.character(raw_),'GRIB_R', trim=TRUE) ~ gsub(".*= (.+) sec.*", "\\1",raw_)
-  )
+  #Filter and retrieve the information of interest (as seen here).
+  grib1 <- as.data.frame(info)
+  grib1 <- as.data.frame(
+    grib1[grep(pattern = 'Band|GRIB_COMMENT|GRIB_REF_TIME', x = info), ]
   )
 
-grib1 <- grib1 %>%
-  dplyr::mutate(column = dplyr::case_when(
-    gdata::startsWith(as.character(raw_),'Band', trim=TRUE) ~ 'Band',
-    gdata::startsWith(as.character(raw_),'GRIB_C', trim=TRUE) ~ 'Variable',
-    gdata::startsWith	(as.character(raw_),'GRIB_R', trim=TRUE) ~ 'Time'
-  )
-  )
-grib1 <- grib1[,-1]
+  colnames(grib1) <- c('raw_')
 
-#Variables to columns and time readable (as seen here).
+  # Clean a little bit (with the help of this post, among others).
 
-max_id <- nrow(grib1)/3
+  grib1 <- grib1 %>%
+    dplyr::mutate(content = dplyr::case_when(
+      gdata::startsWith(as.character(raw_), 'Band', trim = TRUE) ~ gsub(".*Band (.+) Block.*", "\\1",raw_),
+      gdata::startsWith(as.character(raw_), 'GRIB_C', trim = TRUE) ~ sub(".*=", "", raw_),
+      gdata::startsWith(as.character(raw_), 'GRIB_R', trim = TRUE) ~ gsub(".*= (.+) sec.*", "\\1",raw_)
+    ))
 
-grib1$id <- sort(rep(1:max_id,3))
-grib1 <- grib1 %>%  tidyr::pivot_wider(names_from = "column",
-                                       values_from = "content") %>%
-  dplyr::mutate(Time = as.POSIXct(as.numeric(Time),
-                                  origin="1970-01-01"))
+  grib1 <- grib1 %>%
+    dplyr::mutate(column = dplyr::case_when(
+      gdata::startsWith(as.character(raw_), 'Band', trim = TRUE) ~ 'Band',
+      gdata::startsWith(as.character(raw_), 'GRIB_C', trim = TRUE) ~ 'Variable',
+      gdata::startsWith(as.character(raw_), 'GRIB_R', trim = TRUE) ~ 'Time'
+    ))
 
-grib1 <- grib1[,-1]
+  grib1 <- grib1[, -1]
 
-grib1
+  #Variables to columns and time readable (as seen here).
+
+  max_id <- nrow(grib1) / 3
+
+  grib1$id <- sort(rep(seq_len(max_id), 3L))
+
+  grib1 <- grib1 %>%  tidyr::pivot_wider(
+    names_from = "column",
+    values_from = "content"
+  ) %>%
+    dplyr::mutate(
+      Time = as.POSIXct(as.numeric(Time), origin = "1970-01-01")
+    )
+
+  grib1 <- grib1[, -1]
+
+  grib1
 }
