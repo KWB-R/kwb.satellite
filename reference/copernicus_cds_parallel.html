@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Copernicus Climate Data Store: Multi Query — copernicus_cds_parallel" />
-<meta property="og:description" content="Copernicus Climate Data Store: Multi Query" />
+<meta property="og:description" content="Runs copernicus_cds in parallel for all variables
+defined in parameter &quot;variables&quot; on all machine cores minus one" />
 
 
 
@@ -129,7 +130,8 @@
     </div>
 
     <div class="ref-description">
-    <p>Copernicus Climate Data Store: Multi Query</p>
+    <p>Runs <code>copernicus_cds</code> in parallel for all variables
+defined in parameter "variables" on all machine cores minus one</p>
     </div>
 
     <pre class="usage"><span class='fu'>copernicus_cds_parallel</span><span class='op'>(</span>
@@ -146,6 +148,30 @@
       <td><p>default: c("2m_temperature", "evaporation", "potential_evaporation",
 "precipitation_type", "runoff", "sub_surface_runoff", "surface_runoff",
 "total_precipitation")</p></td>
+    </tr>
+    <tr>
+      <th>dataset_short_name</th>
+      <td><p>"reanalysis-era5-single-levels"</p></td>
+    </tr>
+    <tr>
+      <th>product_type</th>
+      <td><p>default: "reanalysis"</p></td>
+    </tr>
+    <tr>
+      <th>years</th>
+      <td><p>character vector of years (default:  as.character(seq(2010, 2020)))</p></td>
+    </tr>
+    <tr>
+      <th>area</th>
+      <td><p>area coordinates in latitude/longitude (default: c(40, 116, 39, 117))</p></td>
+    </tr>
+    <tr>
+      <th>file_format</th>
+      <td><p>"grib" or "netcdf"</p></td>
+    </tr>
+    <tr>
+      <th>export_dir</th>
+      <td><p>default: "."</p></td>
     </tr>
     </table>
 
