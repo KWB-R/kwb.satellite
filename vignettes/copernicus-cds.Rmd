@@ -88,3 +88,15 @@ request <- list(
 Take a break and wait until request is finished this may take a few hours. To 
 check the progress of the request visit: 
 [https://cds.climate.copernicus.eu/cdsapp#!/yourrequests](https://cds.climate.copernicus.eu/cdsapp#!/yourrequests)
+
+
+### 6. Load raster data
+
+```{r load, eval = FALSE}
+
+grib_file <- "download.grib"
+
+meta <- kwb.satellite::get_metadata_era5(grib_file)
+
+temperature <- raster::raster(grib_file)
+```
