@@ -17,10 +17,19 @@ get_metadata_era5 <- function(grib_file) {
 
   info <- gdalUtils::gdalinfo(grib_file)
 
+  select_pattern <- paste0(c("Band",
+                             "GRIB_COMMENT",
+                             "GRIB_ELEMENT",
+                             "GRIB_FORECAST_SECONDS",
+                             "GRIB_REF_TIME",
+                             "GRIB_SHORT_NAME",
+                             "GRIB_UNIT"),
+                           collapse = "|")
+
   #Filter and retrieve the information of interest (as seen here).
   grib1 <- as.data.frame(info)
   grib1 <- as.data.frame(
-    grib1[grep(pattern = 'Band|GRIB_COMMENT|GRIB_REF_TIME', x = info), ]
+    grib1[grep(pattern = select_pattern, x = info), ]
   )
 
   colnames(grib1) <- c('raw_')
@@ -31,20 +40,34 @@ get_metadata_era5 <- function(grib_file) {
   }
 
   is_band <- raw_starts_with('Band')
-  is_grib_c <- raw_starts_with('GRIB_C')
-  is_grib_r <- raw_starts_with('GRIB_R')
+  is_grib_c <- raw_starts_with('GRIB_COMMENT')
+  is_grib_e <- raw_starts_with('GRIB_ELEMENT')
+  is_grib_f <- raw_starts_with('GRIB_FORECAST_SECONDS')
+  is_grib_r <- raw_starts_with('GRIB_REF_TIME')
+  is_grib_s <- raw_starts_with('GRIB_SHORT_NAME')
+  is_grib_u <- raw_starts_with('GRIB_UNIT')
 
   grib1 <- grib1 %>%
     dplyr::mutate(
       content = dplyr::case_when(
         is_band ~ gsub(".*Band (.+) Block.*", "\\1", raw_),
         is_grib_c ~ sub(".*=", "", raw_),
-        is_grib_r ~ gsub(".*= (.+) sec.*", "\\1", raw_)
+        is_grib_e ~ sub(".*=", "", raw_),
+        is_grib_f ~ gsub(".*=(.+) sec.*", "\\1", raw_),
+        is_grib_r ~ gsub(".*= (.+) sec.*", "\\1", raw_),
+        is_grib_s ~ sub(".*=", "", raw_),
+        is_grib_u ~ sub(".*=", "", raw_) %>%
+                    stringr::str_remove("\\[") %>%
+                    stringr::str_remove("\\]")
       ),
       column = dplyr::case_when(
-        is_band ~ 'Band',
-        is_grib_c ~ 'Variable',
-        is_grib_r ~ 'Time'
+        is_band ~ 'band',
+        is_grib_c ~ 'variable',
+        is_grib_e ~ 'variable_short',
+        is_grib_f ~ 'forecast_seconds',
+        is_grib_r ~ 'time',
+        is_grib_s ~ 'short_name',
+        is_grib_u ~ 'unit'
       )
     )
 
@@ -52,16 +75,18 @@ get_metadata_era5 <- function(grib_file) {
 
   #Variables to columns and time readable (as seen here).
 
-  max_id <- nrow(grib1) / 3
+  n_variables <- as.integer(length(unique(grib1$column)))
 
-  grib1$id <- sort(rep(seq_len(max_id), 3L))
+  max_id <- as.integer(nrow(grib1) / n_variables)
+
+  grib1$id <- sort(rep(seq_len(max_id), n_variables))
 
   grib1 <- grib1 %>%  tidyr::pivot_wider(
     names_from = "column",
     values_from = "content"
   ) %>%
     dplyr::mutate(
-      Time = as.POSIXct(as.numeric(Time), origin = "1970-01-01", tz = "UTC")
+      time = as.POSIXct(as.numeric(time), origin = "1970-01-01", tz = "UTC")
     )
 
   grib1 <- grib1[, -1]
