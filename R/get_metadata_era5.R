@@ -61,7 +61,7 @@ get_metadata_era5 <- function(grib_file) {
     values_from = "content"
   ) %>%
     dplyr::mutate(
-      Time = as.POSIXct(as.numeric(Time), origin = "1970-01-01")
+      Time = as.POSIXct(as.numeric(Time), origin = "1970-01-01", tz = "UTC")
     )
 
   grib1 <- grib1[, -1]
