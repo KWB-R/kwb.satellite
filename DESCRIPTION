@@ -30,6 +30,7 @@ Imports:
     gdata,
     kwb.utils,
     magrittr, 
+    stringr,
     tidyr
 Suggests: 
     covr,
