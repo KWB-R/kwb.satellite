@@ -34,21 +34,21 @@ createTimeBand <-function(img) {
 }
 
 img <- ee$
-  ImageCollection('JAXA/GPM_L3/GSMaP/v6/operational')$
-  filterBounds(ee$Geometry$Point(-70.48, 43.3631))$
-  select('hourlyPrecipRate')$
+  ImageCollection('ECMWF/ERA5_LAND/HOURLY')$
+  filterBounds(ee$Geometry$Point(117, 40))$
+  select('total_precipitation')$
   first()
 
 
 vizParams <- list(
-  bands = 'hourlyPrecipRate',
+  bands = 'total_precipitation',
   min = 0,
-  max = 2000,
-  gamma = 0.9
+  max = 0.0000005,
+  gamma = 0.01
 )
 
-# Center the map and display the image.
-Map$centerObject(img, 7)
+Map$setCenter(117, 40, 10)
+
 # You can see it
 m1 <- Map$addLayer(img, vizParams, 'first')
 m1
