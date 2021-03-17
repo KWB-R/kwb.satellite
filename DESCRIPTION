@@ -33,9 +33,13 @@ Imports:
     tidyr
 Suggests: 
     covr,
+    cubelyr,
     knitr,
+    kwb.pkgbuild,
     raster,
-    rmarkdown
+    rmarkdown,
+    stars
 Remotes: 
-    github::kwb-r/kwb.utils
+    github::kwb-r/kwb.utils,
+    github::kwb-r/kwb.pkgbuild
 VignetteBuilder: knitr

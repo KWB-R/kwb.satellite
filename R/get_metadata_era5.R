@@ -8,6 +8,7 @@
 #' @importFrom tidyr pivot_wider
 #' @importFrom gdata startsWith
 #' @importFrom dplyr case_when mutate
+#' @importFrom stringr str_remove
 #' @seealso Code taken from https://gis.stackexchange.com/a/360652
 #'
 get_metadata_era5 <- function(grib_file) {
@@ -22,6 +23,7 @@ get_metadata_era5 <- function(grib_file) {
                              "GRIB_ELEMENT",
                              "GRIB_FORECAST_SECONDS",
                              "GRIB_REF_TIME",
+                             "GRIB_VALID_TIME",
                              "GRIB_SHORT_NAME",
                              "GRIB_UNIT"),
                            collapse = "|")
@@ -44,6 +46,7 @@ get_metadata_era5 <- function(grib_file) {
   is_grib_e <- raw_starts_with('GRIB_ELEMENT')
   is_grib_f <- raw_starts_with('GRIB_FORECAST_SECONDS')
   is_grib_r <- raw_starts_with('GRIB_REF_TIME')
+  is_grib_v <- raw_starts_with('GRIB_VALID_TIME')
   is_grib_s <- raw_starts_with('GRIB_SHORT_NAME')
   is_grib_u <- raw_starts_with('GRIB_UNIT')
 
@@ -55,6 +58,7 @@ get_metadata_era5 <- function(grib_file) {
         is_grib_e ~ sub(".*=", "", raw_),
         is_grib_f ~ gsub(".*=(.+) sec.*", "\\1", raw_),
         is_grib_r ~ gsub(".*= (.+) sec.*", "\\1", raw_),
+        is_grib_v ~ gsub(".*= (.+) sec.*", "\\1", raw_),
         is_grib_s ~ sub(".*=", "", raw_),
         is_grib_u ~ sub(".*=", "", raw_) %>%
                     stringr::str_remove("\\[") %>%
@@ -62,10 +66,11 @@ get_metadata_era5 <- function(grib_file) {
       ),
       column = dplyr::case_when(
         is_band ~ 'band',
-        is_grib_c ~ 'variable',
+        is_grib_c ~ 'variable_unit',
         is_grib_e ~ 'variable_short',
         is_grib_f ~ 'forecast_seconds',
-        is_grib_r ~ 'time',
+        is_grib_r ~ 'time_ref',
+        is_grib_v ~ 'time_valid',
         is_grib_s ~ 'short_name',
         is_grib_u ~ 'unit'
       )
@@ -86,8 +91,11 @@ get_metadata_era5 <- function(grib_file) {
     values_from = "content"
   ) %>%
     dplyr::mutate(
-      time = as.POSIXct(as.numeric(time), origin = "1970-01-01", tz = "UTC")
-    )
+      time_ref = as.POSIXct(as.numeric(time_ref), origin = "1970-01-01", tz = "UTC"),
+      time_valid = as.POSIXct(as.numeric(time_valid), origin = "1970-01-01", tz = "UTC"),
+      time_forecast = time_ref + as.numeric(forecast_seconds),
+      variable = stringr::str_remove(variable_unit,
+                                     pattern = "\\s+\\[.*\\]$"))
 
   grib1 <- grib1[, -1]
 
