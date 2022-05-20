@@ -1,7 +1,8 @@
 pandoc: 2.7.3
-pkgdown: 1.6.1
+pkgdown: 2.0.3
 pkgdown_sha: ~
 articles:
   copernicus-cds: copernicus-cds.html
-last_built: 2021-03-15T09:40Z
+  google-earth-engine: google-earth-engine.html
+last_built: 2022-05-20T14:12Z
 
