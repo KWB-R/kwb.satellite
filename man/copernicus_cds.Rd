@@ -21,9 +21,11 @@ copernicus_cds(
 
 \item{product_type}{default: "reanalysis"}
 
-\item{years}{character vector of years (default:  as.character(seq(2010, 2020)))}
+\item{years}{character vector of years (default:  as.character(seq(2010,
+2020)))}
 
-\item{area}{area coordinates in latitude/longitude (default: c(40, 116, 39, 117))}
+\item{area}{area coordinates in latitude/longitude (default: c(40, 116, 39,
+117))}
 
 \item{file_format}{"grib" or "netcdf"}
 
@@ -33,8 +35,8 @@ copernicus_cds(
 path to file with exported data
 }
 \description{
-Run request (may take a while as nothing happens because many requests R
-are queued (in addition: maximum request data amount limited to 140000
-data points).
-To check queue status: "https://cds.climate.copernicus.eu/cdsapp#!/yourrequests?tab=form"
+Run request (may take a while as nothing happens because many
+requests R are queued (in addition: maximum request data amount limited to
+140000 data points). To check queue status:
+"https://cds.climate.copernicus.eu/cdsapp#!/yourrequests?tab=form"
 }
