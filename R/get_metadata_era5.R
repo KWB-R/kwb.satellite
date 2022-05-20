@@ -4,11 +4,12 @@
 #'
 #' @return metadata
 #' @export
-#' @importFrom gdalUtils gdalinfo
+#' @importFrom gdalUtilities gdalinfo
 #' @importFrom tidyr pivot_wider
 #' @importFrom gdata startsWith
 #' @importFrom dplyr case_when mutate
 #' @importFrom stringr str_remove
+#' @importFrom rlang .data
 #' @seealso Code taken from https://gis.stackexchange.com/a/360652
 #'
 get_metadata_era5 <- function(grib_file) {
@@ -16,7 +17,7 @@ get_metadata_era5 <- function(grib_file) {
   ### Code copied from:
   ### https://gis.stackexchange.com/questions/360547/era5-grib-file-how-to-know-what-each-band-means
 
-  info <- gdalUtils::gdalinfo(grib_file)
+  info <- gdalUtilities::gdalinfo(grib_file)
 
   select_pattern <- paste0(c("Band",
                              "GRIB_COMMENT",
@@ -91,10 +92,10 @@ get_metadata_era5 <- function(grib_file) {
     values_from = "content"
   ) %>%
     dplyr::mutate(
-      time_ref = as.POSIXct(as.numeric(time_ref), origin = "1970-01-01", tz = "UTC"),
-      time_valid = as.POSIXct(as.numeric(time_valid), origin = "1970-01-01", tz = "UTC"),
-      time_forecast = time_ref + as.numeric(forecast_seconds),
-      variable = stringr::str_remove(variable_unit,
+      time_ref = as.POSIXct(as.numeric(.data$time_ref), origin = "1970-01-01", tz = "UTC"),
+      time_valid = as.POSIXct(as.numeric(.data$time_valid), origin = "1970-01-01", tz = "UTC"),
+      time_forecast = .data$time_ref + as.numeric(.data$forecast_seconds),
+      variable = stringr::str_remove(.data$variable_unit,
                                      pattern = "\\s+\\[.*\\]$"))
 
   grib1 <- grib1[, -1]

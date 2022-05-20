@@ -1,7 +1,7 @@
 Package: kwb.satellite
 Title: R Package for Working with Satellite Data from Various
     Providers (Copernicus, GoogleEarthEngine)
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     c(person(given = "Michael",
              family = "Rustler",
@@ -27,10 +27,11 @@ BugReports: https://github.com/KWB-R/kwb.satellite/issues
 Imports: 
     dplyr,
     ecmwfr,
-    gdalUtils,
+    gdalUtilities,
     gdata,
     kwb.utils,
     magrittr,
+    rlang,
     stringr,
     tidyr
 Suggests: 
@@ -39,6 +40,8 @@ Suggests:
     knitr,
     kwb.pkgbuild,
     raster,
+    reticulate,
+    rgee,
     rmarkdown,
     stars
 VignetteBuilder: 
@@ -49,4 +52,4 @@ Remotes:
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
