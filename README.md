@@ -3,6 +3,7 @@
 [![codecov](https://codecov.io/github/KWB-R/kwb.satellite/branch/main/graphs/badge.svg)](https://codecov.io/github/KWB-R/kwb.satellite)
 [![Project Status](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/kwb.satellite)]()
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.6566986.svg)](https://doi.org/10.5281/zenodo.6566986)
 
 # kwb.satellite
 
