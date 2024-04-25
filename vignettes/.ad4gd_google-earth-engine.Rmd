@@ -1,0 +1,97 @@
+---
+title: "Google Earth Engine"
+author: "Michael Rustler"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Google Earth Engine}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Install R packages
+
+```{r install, eval = FALSE}
+pkgs_cran <- c("geojsonsf", "rgee", "reticulate")
+pkgs_runiverse <- "kwb.python"
+pkgs <- c(pkgs_cran, pkgs_runiverse)
+install.packages(pkgs, repos = c("https://cloud.r-project.org",
+                                 "https://kwb-r.r-universe.dev"))
+
+
+### Downgrade to last one supplied by R package "rgee"
+kwb.python::conda_py_install("ad4gd", pkgs = list(conda = c("python=3.12.2",
+                                                            "numpy"),
+                                                  py = "earthengine-api==0.1.370"))
+
+
+
+
+```
+
+## Use
+
+```{r use, eval = FALSE}
+reticulate::use_condaenv("ad4gd")
+
+
+library(rgee)
+
+rgee::ee_Initialize()
+
+```
+
+## Get Lakes Berlin
+
+```{r lakes_berlin}
+url <- "https://fbinter.stadt-berlin.de/fb/atom/Gewaesserkarte/Gewaesserkarte.zip"
+tfile <- basename(url)
+
+download.file(url, destfile = basename(url))
+
+unzip(zipfile = tfile,
+      exdir = "gewaesser_berlin")
+
+gewaesser_flaechen <- sf::read_sf("gewaesser_berlin/Gewaesser_Berlin_Flaechen.shp",
+                                  options = "ENCODING=WINDOWS-1252")
+
+gewaesser_flaechen$area <- sf::st_area(gewaesser_flaechen)
+
+#View(gewaesser_flaechen)
+
+gewaesser_flaechen <- gewaesser_flaechen %>%
+  dplyr::filter(stringr::str_starts(GEWART, pattern = "Stehendes"))
+
+sum(gewaesser_flaechen$area)/1000000
+
+
+```
+
+
+```{r satellite_data}
+
+system.time(
+lake_01_centroid <- kwb.satellite::gee_get_data_for_years(years = 2018:2024,
+                                                          lakes = gewaesser_flaechen[1, ],
+                                                          centroid = TRUE)
+)
+
+id_df <- tibble::tibble(id = seq_along(lake_01), 
+               id_name = names(lake_01))
+
+lake_01_df <- dplyr::left_join(id_df, 
+                               dplyr::bind_rows(lake_01, .id = "id") %>% 
+                               dplyr::mutate(id = as.integer(id)), 
+                               by = "id") %>% 
+  tidyr::unnest(satellite_data)
+
+tmp <- system.time(get_data(lakes = lakes[1:10, ], via = "getinfo"))
+
+
+```

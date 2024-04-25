@@ -1,9 +1,13 @@
 authors:
   Michael Rustler:
     href: https://mrustl.de
+  AD4GD:
+    href: https://www.kompetenz-wasser.de/en/forschung/projekte/ad4gd
+    html: <img src='https://ad4gd.eu/wp-content/uploads/2023/02/logointegrat-color.png'
+      alt='Project AD4GD' width='72' />
   KEYS:
     href: https://kompetenz-wasser.de/en/forschung/projekte/keys
-    html: <img src='https://kompetenz-wasser.de/media/pages/forschung/projekte/keys/bb2d39dc7a-1639132760/keys-logo.png'
+    html: <img src='https://www.kompetenz-wasser.de/media/pages/forschung/projekte/keys/a93e46126d-1702890604/keys-logo.png'
       height='24' />
   Kompetenzzentrum Wasser Berlin gGmbH (KWB):
     href: https://www.kompetenz-wasser.de

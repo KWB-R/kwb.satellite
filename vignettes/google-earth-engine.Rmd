@@ -19,11 +19,17 @@ knitr::opts_chunk$set(
 
 ```{r install, eval = FALSE}
 pkgs_cran <- c("rgee", "reticulate")
-install.packages(pkgs_cran, repos = "https://cloud.r-project.org")
+pkgs_runiverse <- "kwb.python"
+pkgs <- c(pkgs_cran, pkgs_runiverse)
+install.packages(pkgs, repos = c("https://cloud.r-project.org",
+                                 "https://kwb-r.r-universe.dev"))
 
 
 ### Downgrade to last one supplied by R package "rgee"
-reticulate::py_install('earthengine-api==0.1.248')
+kwb.python::conda_py_install("ad4gd", pkgs = list(conda = c("python=3.12.2",
+                                                            "numpy"),
+                                                  py = "earthengine-api==0.1.370"))
+
 
 
 
@@ -32,23 +38,26 @@ reticulate::py_install('earthengine-api==0.1.248')
 ## Use
 
 ```{r use, eval = FALSE}
+reticulate::use_condaenv("ad4gd")
+
+
 library(rgee)
 
-rgee::ee_Initialize() # it will work now!
+rgee::ee_Initialize()
 
 createTimeBand <-function(img) {
   year <- ee$Date(img$get('system:time_start'))$get('year')$subtract(1991L)
   ee$Image(year)$byte()$addBands(img)
 }
 
-img <- ee$ImageCollection('ECMWF/ERA5_LAND/HOURLY')$
-  filterBounds(ee$Geometry$Point(117, 40))$
-  select('total_precipitation')$
+img <- ee$ImageCollection('COPERNICUS/S2_SR_HARMONIZED')$
+  filterBounds(ee$Geometry$Point(52, 12))$
+  select('B2')$
   first()
 
 
 vizParams <- list(
-  bands = 'total_precipitation',
+  bands = 'B2',
   min = 0,
   max = 0.0000005,
   gamma = 0.01

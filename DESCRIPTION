@@ -1,7 +1,7 @@
 Package: kwb.satellite
 Title: R Package for Working with Satellite Data from Various
     Providers (Copernicus, GoogleEarthEngine)
-Version: 0.1.0
+Version: 0.1.0.9000
 Authors@R: 
     c(person(given = "Michael",
              family = "Rustler",
@@ -13,6 +13,8 @@ Authors@R:
              role = "ctb",
              email = "hauke.sonnenberg@kompetenz-wasser.de",
              comment = c(ORCID = "0000-0001-9134-2871")),
+      person(given = "AD4GD",
+             role = "fnd"),
       person(given = "KEYS",
              role = "fnd"),
       person(given = "Kompetenzzentrum Wasser Berlin gGmbH (KWB)",
@@ -29,11 +31,16 @@ Imports:
     ecmwfr,
     gdalUtilities,
     gdata,
+    lubridate,
     kwb.utils,
     magrittr,
+    rgee,
     rlang,
+    sf,
     stringr,
-    tidyr
+    tibble,
+    tidyr,
+    tidyselect
 Suggests: 
     covr,
     cubelyr,
@@ -41,7 +48,6 @@ Suggests:
     kwb.pkgbuild,
     raster,
     reticulate,
-    rgee,
     rmarkdown,
     stars
 VignetteBuilder: 
@@ -52,4 +58,4 @@ Remotes:
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.3.1
