@@ -44,28 +44,40 @@ gee_get_data_for_years <- function(years = 2018,
     start_date <- sprintf("%d-01-01", year)
     end_date <- sprintf("%d-12-31", year)
 
-    kwb.utils::catAndRun(sprintf("Downloading data for %d lakes for year '%d' and spatial aggregation function '%s'",
+    # Definieren der Sentinel-2 Kollektion und Filtern nach Wolkenbedeckung
+    collection <- rgee::ee$ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+
+    if(!is.null(bands)) collection <- collection$select(bands)
+
+    collection <- collection$
+      filterBounds(rgee::sf_as_ee(lakes_boundary))$
+      filterDate(start_date, end_date)
+
+    if (debug && ee_print) {
+      rgee::ee_print(collection) # Useful for debugging.
+    }
+
+   c <- collection$getInfo()
+
+    n_images <-  length(dat$features)
+    n_bands <- length(dat$features[[1]]$bands)
+
+    kwb.utils::catAndRun(sprintf("Downloading data for %d lake(s) for year '%d' and spatial aggregation function '%s' (number_of_images: %d, number_of_bands: %d)",
                                  nrow(lakes),
                                  year,
-                                 reducer_function_name),
+                                 reducer_function_name,
+                                 n_images,
+                                 n_bands),
                          expr = {
-                           # Definieren der Sentinel-2 Kollektion und Filtern nach Wolkenbedeckung
-                           collection <- rgee::ee$ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
-
-                           if(!is.null(bands)) collection <- collection$select(bands)
-
-                           collection <- collection$
-                             filterBounds(rgee::sf_as_ee(lakes_boundary))$
-                             filterDate(start_date, end_date)
-
-                           if (debug && ee_print) {
-                             rgee::ee_print(collection) # Useful for debugging.
-                           }
-
-                           get_data(collection, lakes, centroid, ee_fun, via, col_lakename)
-
-                         })
-  }),
+                           stopifnot(n_images * n_bands <= 5000)
+                           list(data = gee_get_data(collection,lakes, centroid, ee_fun, via, col_lakename) %>%
+                                  dplyr::bind_rows(),
+                                metadata = list(lakes_boundary = lakes_boundary,
+                                                metadata = gee_get_metadata(collection))
+                                )
+                         },
+                         dbg = debug,
+                         newLine = 1L)}),
   nm = sprintf("%s_%s_%s", shape_type, reducer_function_name, years))
 }
 
@@ -91,7 +103,7 @@ gee_get_data_for_years <- function(years = 2018,
 #' @importFrom tidyselect all_of
 #' @importFrom lubridate ymd_hms
 #' @importFrom tidyr pivot_longer separate nest
-gee_get_data <- function (collection = collection,
+gee_get_data <- function (collection,
                           lakes,
                           centroid = FALSE,
                           ee_fun = rgee::ee$Reducer$mean(),
@@ -122,6 +134,11 @@ gee_get_data <- function (collection = collection,
           rgee::sf_as_ee(lake)
         }
 
+        collection_lake <- collection$filterBounds(lake_gee)
+
+        metadata <- gee_get_metadata(collection_lake)
+
+
         image_extract <- rgee::ee_extract(
           x = collection,
           y =  lake_gee,
@@ -129,8 +146,7 @@ gee_get_data <- function (collection = collection,
           scale = 10,
           sf = TRUE,
           via = via
-        )#},
-        #times = 10)})
+        )
 
         sat_col_ids <- startsWith(names(image_extract), "X")
         sat_cols <- names(image_extract)[sat_col_ids]
@@ -162,10 +178,12 @@ gee_get_data <- function (collection = collection,
         #dplyr::filter(QA60 == 0)
 
 
-        dplyr::bind_cols(lake,
-                         tidyr::nest(band_timeseries, .key = "satellite_data"))
+        tmp <- dplyr::bind_cols(lake,
+                         tidyr::nest(band_timeseries_wide, .key = "satellite_data")) %>%
+          dplyr::bind_cols(tidyr::nest(metadata, .key = "satellite_metadata"))
       },
-      dbg = debug
+      dbg = debug,
+      newLine = 1L
     )
 
     return(res)

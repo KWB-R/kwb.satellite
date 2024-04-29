@@ -1,5 +1,5 @@
 ---
-title: "Google Earth Engine"
+title: "AD4DG: Google Earth Engine"
 author: "Michael Rustler"
 output: rmarkdown::html_vignette
 vignette: >
@@ -76,11 +76,57 @@ sum(gewaesser_flaechen$area)/1000000
 
 ```{r satellite_data}
 
+
+
 system.time(
-lake_01_centroid <- kwb.satellite::gee_get_data_for_years(years = 2018:2024,
-                                                          lakes = gewaesser_flaechen[1, ],
+lakes_0107_centroid <- kwb.satellite::gee_get_data_for_years(years = 2019,
+                                                          lakes = gewaesser_flaechen[1:7, ],
+                                                          #bands = NULL,
                                                           centroid = TRUE)
 )
+
+min_size_for_parallel = 10L
+
+# Should we do parallel processing?
+doParallel <- length(gewaesser_flaechen) >= min_size_for_parallel && 
+  (ncores <- parallel::detectCores() - 1L) > 1L
+
+sat_data <- if (doParallel) {
+      (ncores <- parallel::detectCores() - 1L) 
+      # Prepare parallel processing
+      cl <- parallel::makeCluster(ncores)
+      on.exit(parallel::stopCluster(cl))
+      
+      
+      
+       kwb.utils::catAndRun(
+        sprintf(
+          "Downloading satellite data for %d lakes in parallel on %d cores",
+          nrow(gewaesser_flaechen),
+          ncores
+        ),
+        expr = {
+          # Call the call_with_data function in a (parallel) loop
+          parallel::parLapply(cl, 
+                              1:7, 
+                              fun = function(idx) {
+                                lakes <- gewaesser_flaechen[idx,]
+                                print(lakes)
+                                reticulate::use_condaenv("ad4gd")
+                                rgee::ee_Initialize()
+                                kwb.satellite::gee_get_data_for_years(
+                                years = 2018, 
+                                lakes = lakes,
+                                #bands = NULL,
+                                centroid = TRUE
+                                )})
+        }
+      )
+
+    } else {
+      #do nothing
+    }
+
 
 id_df <- tibble::tibble(id = seq_along(lake_01), 
                id_name = names(lake_01))

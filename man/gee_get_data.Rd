@@ -5,7 +5,7 @@
 \title{Google Earth Engine: get data for years}
 \usage{
 gee_get_data(
-  collection = collection,
+  collection,
   lakes,
   centroid = FALSE,
   ee_fun = rgee::ee$Reducer$mean(),
