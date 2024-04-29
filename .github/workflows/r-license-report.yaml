@@ -1,0 +1,43 @@
+---
+name: License Compliance Check
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - dev
+  pull_request:
+    branches:
+      - master
+      - main
+      - dev
+
+jobs:
+  license-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Generate License Report
+        uses: insightsengineering/r-license-report@v1
+        with:
+          # R package root path, in case your R package is within a subdirectory of the repo
+          path: "."
+          # A regular expression that can be used for matching and flagging non-compliant licenses
+          regex: "^AGPL.*"
+          # Fail the action if 1 or more matching non-compliant licenses are found
+          fail: true
+          # Select an RSPM snapshot date for CRAN dependency metadata retrieval
+          #rspm_snapshot_date: "2021-12-12"
+          # Select a Bioconductor release version for BioC dependency metadata retrieval
+          #bioc_release: "3.14"
+          # Whether you also want the report as an `html` file
+          as_html: true
+
+      - name: Upload PDF Report
+        uses: actions/upload-artifact@v2
+        with:
+          name: license-report.pdf
+          path: license-report.pdf
