@@ -9,25 +9,30 @@ gee_get_data(
   lakes,
   centroid = FALSE,
   ee_fun = rgee::ee$Reducer$mean(),
+  scale = 10,
   via = "getInfo",
   col_lakename = "GEWNAME",
   debug = TRUE
 )
 }
 \arguments{
-\item{collection}{collection}
+\item{collection}{collection satellite collection}
 
-\item{lakes}{lakes}
+\item{lakes}{lakes sf data frame witch shapes of lakes}
 
-\item{centroid}{centroid}
+\item{centroid}{use centroid or polygon? (default: FALSE)}
 
-\item{ee_fun}{ee_fun}
+\item{ee_fun}{spatial aggregation function (default: rgee::ee$Reducer$mean())}
 
-\item{via}{via}
+\item{scale}{scale parameter (default: 10), for details, see
+\url{https://developers.google.com/earth-engine/guides/scale}}
 
-\item{col_lakename}{col_lakename}
+\item{via}{via (default: "getInfo"), other options use google cloud storage}
 
-\item{debug}{debug}
+\item{col_lakename}{col_lakename ("GEWNAME", used by Berlin authority for surface
+water bodies)}
+
+\item{debug}{print debug messages? (default: TRUE)}
 }
 \value{
 tibble

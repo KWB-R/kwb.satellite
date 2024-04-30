@@ -2,7 +2,7 @@
 title: "Copernicus Climate Data Store"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{copernicus-cds}
+  %\VignetteIndexEntry{Copernicus Climate Data Store}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

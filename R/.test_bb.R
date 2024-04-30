@@ -3,8 +3,9 @@ archive::archive_extract("https://data.geobasis-bb.de/geofachdaten/Wasser/Gewaes
 
 lakes_bb_clear <- sf::read_sf("Klarwasserseen.shp")
 
-archive::archive_extract("https://data.geobasis-bb.de/geofachdaten/Wasser/Hydrologie/seen25.zip")
-lakes_bb <- sf::read_sf("Seen25_20211105/seen25.shp")
+archive::archive_extract("https://data.geobasis-bb.de/geofachdaten/Wasser/Hydrologie/seen25.zip",
+                         dir = "lakes_bb")
+lakes_bb <- sf::read_sf("lakes_bb/Seen25_20211105/seen25.shp")
 
 baalsee <- lakes_bb[lakes_bb$SEE_NAME == "Großer Baalsee",]
 

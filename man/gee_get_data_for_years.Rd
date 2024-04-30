@@ -7,9 +7,11 @@
 gee_get_data_for_years(
   years = 2018,
   lakes,
+  image_collection = "COPERNICUS/S2_SR_HARMONIZED",
   bands = as.list(c("QA60", paste0("B", 1:6))),
   centroid = FALSE,
   ee_fun = rgee::ee$Reducer$mean(),
+  scale = 10,
   via = "getInfo",
   col_lakename = "GEWNAME",
   debug = TRUE,
@@ -17,17 +19,23 @@ gee_get_data_for_years(
 )
 }
 \arguments{
-\item{years}{years}
+\item{years}{years vector of years for which satellite data should be downloaded}
 
-\item{lakes}{lakes}
+\item{lakes}{lakes sf data frame witch shapes of lakes}
+
+\item{image_collection}{image collection (default: "COPERNICUS/S2_SR_HARMONIZED")}
 
 \item{bands}{bands}
 
-\item{centroid}{centroid}
+\item{centroid}{use centroid or polygon? (default: FALSE)}
 
-\item{ee_fun}{ee_fun}
+\item{ee_fun}{spatial aggregation function (default: rgee::ee$Reducer$mean())}
 
-\item{via}{via}
+\item{scale}{scale parameter (default: 10), for details, see
+\url{https://developers.google.com/earth-engine/guides/scale}}
+
+\item{via}{via (default: "getInfo"), other options use google cloud (google drive
+or google cloud storage)}
 
 \item{col_lakename}{col_lakename (default: "GEWNAME")}
 
@@ -36,7 +44,7 @@ gee_get_data_for_years(
 \item{ee_print}{show debug messages for "ee" (default: FALSE)}
 }
 \value{
-tibble
+list with data and metadata, each of them tibbles
 }
 \description{
 Google Earth Engine: get data for years

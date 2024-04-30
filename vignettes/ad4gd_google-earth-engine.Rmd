@@ -3,7 +3,7 @@ title: "AD4DG: Google Earth Engine"
 author: "Michael Rustler"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Google Earth Engine}
+  %\VignetteIndexEntry{AD4DG: Google Earth Engine}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,7 +19,7 @@ is_gh_actions <- identical(Sys.getenv("CI"), "true")
 
 ## Install R packages
 
-```{r install, eval = FALSE}
+```{r install, eval = is_gh_actions}
 pkgs_cran <- c("geojsonsf", "rgee", "reticulate")
 pkgs_runiverse <- "kwb.python"
 pkgs <- c(pkgs_cran, pkgs_runiverse)
@@ -39,52 +39,59 @@ kwb.python::conda_py_install("ad4gd", pkgs = list(conda = c("python=3.12.2",
 
 ## Use
 
-```{r use, eval = !is_gh_actions}
-reticulate::use_condaenv("ad4gd")
+### Get Lakes 
 
-```
-
-### Get Lakes Berlin
+#### Lakes Berlin
 
 ```{r lakes_berlin}
+library(magrittr)
+
 url <- "https://fbinter.stadt-berlin.de/fb/atom/Gewaesserkarte/Gewaesserkarte.zip"
 tfile <- basename(url)
 
 download.file(url, destfile = basename(url))
 
 unzip(zipfile = tfile,
-      exdir = "gewaesser_berlin")
+      exdir = "lakes_berlin")
 
-gewaesser_flaechen <- sf::read_sf("gewaesser_berlin/Gewaesser_Berlin_Flaechen.shp",
-                                  options = "ENCODING=WINDOWS-1252")
-
-gewaesser_flaechen$area <- sf::st_area(gewaesser_flaechen)
-
-#View(gewaesser_flaechen)
-
-gewaesser_flaechen <- gewaesser_flaechen %>%
+lakes_berlin <- sf::read_sf("gewaesser_berlin/Gewaesser_Berlin_Flaechen.shp",
+                                  options = "ENCODING=WINDOWS-1252") %>% 
+  dplyr::mutate(area = sf::st_area(.)) %>%
   dplyr::filter(stringr::str_starts(GEWART, pattern = "Stehendes"))
 
-sum(gewaesser_flaechen$area)/1000000
 
+```
+
+#### Lakes Brandenburg
+
+```{r lakes_brandenburg}
+archive::archive_extract("https://data.geobasis-bb.de/geofachdaten/Wasser/Hydrologie/seen25.zip", 
+                         dir = "lakes_bb")
+lakes_bb <- sf::read_sf("lakes_bb/Seen25_20211105/seen25.shp")
+
+baalsee <- lakes_bb[lakes_bb$SEE_NAME == "Großer Baalsee",]
 
 ```
 
 ### Get Satellite Data
 
 ```{r satellite_data, eval = ! is_gh_actions}
+reticulate::use_condaenv("ad4gd")
+
 library(rgee)
 
 rgee::ee_Initialize()
 
-
 system.time(
-lakes_0107_centroid <- kwb.satellite::gee_get_data_for_years(years = 2019,
-                                                          lakes = gewaesser_flaechen[1:7, ],
-                                                          #bands = NULL,
-                                                          centroid = TRUE)
+lakes_0107_centroid <- kwb.satellite::gee_get_data_for_years(
+  years = 2018:2019,
+  lakes = lakes_berlin[1, ],
+  #bands = NULL,
+  centroid = TRUE)
 )
 
+
+if(FALSE) {
 min_size_for_parallel = 10L
 
 # Should we do parallel processing?
@@ -127,17 +134,7 @@ sat_data <- if (doParallel) {
       #do nothing
     }
 
-
-id_df <- tibble::tibble(id = seq_along(lake_01), 
-               id_name = names(lake_01))
-
-lake_01_df <- dplyr::left_join(id_df, 
-                               dplyr::bind_rows(lake_01, .id = "id") %>% 
-                               dplyr::mutate(id = as.integer(id)), 
-                               by = "id") %>% 
-  tidyr::unnest(satellite_data)
-
-tmp <- system.time(get_data(lakes = lakes[1:10, ], via = "getinfo"))
+}
 
 
 ```
