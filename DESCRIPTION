@@ -44,6 +44,8 @@ Imports:
 Suggests: 
     covr,
     cubelyr,
+    details,
+    geojsonsf,
     knitr,
     kwb.pkgbuild,
     raster,
