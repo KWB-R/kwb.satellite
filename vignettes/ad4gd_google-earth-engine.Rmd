@@ -54,7 +54,7 @@ download.file(url, destfile = basename(url))
 unzip(zipfile = tfile,
       exdir = "lakes_berlin")
 
-lakes_berlin <- sf::read_sf("gewaesser_berlin/Gewaesser_Berlin_Flaechen.shp",
+lakes_berlin <- sf::read_sf("lakes_berlin/Gewaesser_Berlin_Flaechen.shp",
                                   options = "ENCODING=WINDOWS-1252") %>% 
   dplyr::mutate(area = sf::st_area(.)) %>%
   dplyr::filter(stringr::str_starts(GEWART, pattern = "Stehendes"))
@@ -95,7 +95,7 @@ if(FALSE) {
 min_size_for_parallel = 10L
 
 # Should we do parallel processing?
-doParallel <- length(gewaesser_flaechen) >= min_size_for_parallel && 
+doParallel <- length(lakes_berlin) >= min_size_for_parallel && 
   (ncores <- parallel::detectCores() - 1L) > 1L
 
 sat_data <- if (doParallel) {
@@ -104,29 +104,37 @@ sat_data <- if (doParallel) {
       cl <- parallel::makeCluster(ncores)
       on.exit(parallel::stopCluster(cl))
       
+
       
+     parallel_fun <- function(idx, geo) {
+       lakes <- geo[idx,]
+       print(lakes)
+       reticulate::use_condaenv("ad4gd")
+       rgee::ee_Initialize()
+       kwb.satellite::gee_get_data_for_years(years = 2018, 
+                                lakes = lakes,
+                                #bands = NULL,
+                                centroid = TRUE
+       )
+     }
+     
+     parallel::clusterExport(cl = cl, varlist = c("lakes_berlin"))
+            
       
        kwb.utils::catAndRun(
         sprintf(
           "Downloading satellite data for %d lakes in parallel on %d cores",
-          nrow(gewaesser_flaechen),
+          nrow(lakes_berlin),
           ncores
         ),
         expr = {
           # Call the call_with_data function in a (parallel) loop
-          parallel::parLapply(cl, 
-                              1:7, 
-                              fun = function(idx) {
-                                lakes <- gewaesser_flaechen[idx,]
-                                print(lakes)
-                                reticulate::use_condaenv("ad4gd")
-                                rgee::ee_Initialize()
-                                kwb.satellite::gee_get_data_for_years(
-                                years = 2018, 
-                                lakes = lakes,
-                                #bands = NULL,
-                                centroid = TRUE
-                                )})
+          parallel::parLapply(cl,
+                              list(idx = 1:7, geo = lakes_berlin),
+                              fun = function(inputs) {
+                              parallel_fun(inputs$idx, inputs$geo)
+                                })
+
         }
       )
 
