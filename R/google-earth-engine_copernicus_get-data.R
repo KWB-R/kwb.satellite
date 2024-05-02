@@ -90,7 +90,7 @@ gee_get_data_for_years <- function(years = 2018,
                                                     scale = scale,
                                                     via = via,
                                                     col_lakename = col_lakename),
-                                metadata = list(lakes_boundary = lakes_boundary,
+                                metadata = list(geometry_filter = lakes_boundary,
                                                 metadata = gee_get_metadata(collection))
                            )
                          },
@@ -196,7 +196,8 @@ gee_get_data <- function (collection,
 
         band_timeseries_wide <- band_timeseries %>%
           tidyr::pivot_wider(names_from = band,
-                             values_from = value)
+                             values_from = value) %>%
+          dplyr::mutate(geometry_filter = lake_gee)
 
         dplyr::bind_cols(lake,
                          tidyr::nest(band_timeseries_wide,
