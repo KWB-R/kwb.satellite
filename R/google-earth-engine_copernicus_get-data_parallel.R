@@ -49,7 +49,7 @@ gee_get_data_for_years_parallel <- function(
     ncores = parallel::detectCores() - 1) {
 
   stopifnot(ncores > 1)
-  stopifnot(ncores > parallel::detectCores())
+  stopifnot(ncores <= parallel::detectCores())
 
   # Prepare parallel processing
   cl <- parallel::makeCluster(ncores,
