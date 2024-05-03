@@ -43,7 +43,8 @@ Imports:
     tibble,
     tidyr,
     tidyselect
-Suggests: 
+Suggests:
+    archive,
     covr,
     cubelyr,
     details,
