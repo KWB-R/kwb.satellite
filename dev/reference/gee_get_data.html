@@ -24,6 +24,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/ad4gd_google-earth-engine.html">AD4DG: Google Earth Engine</a>
     <a class="dropdown-item" href="../articles/copernicus-cds.html">Copernicus Climate Data Store</a>
     <a class="dropdown-item" href="../articles/google-earth-engine.html">Google Earth Engine</a>
   </div>
@@ -63,6 +64,7 @@
 <span>  <span class="va">lakes</span>,</span>
 <span>  centroid <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ee_fun <span class="op">=</span> <span class="fu">rgee</span><span class="fu">::</span><span class="va"><a href="https://r-spatial.github.io/rgee/reference/ee.html" class="external-link">ee</a></span><span class="op">$</span><span class="va">Reducer</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  scale <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  via <span class="op">=</span> <span class="st">"getInfo"</span>,</span>
 <span>  col_lakename <span class="op">=</span> <span class="st">"GEWNAME"</span>,</span>
 <span>  debug <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -72,31 +74,37 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>collection</dt>
-<dd><p>collection</p></dd>
+<dd><p>collection satellite collection</p></dd>
 
 
 <dt>lakes</dt>
-<dd><p>lakes</p></dd>
+<dd><p>lakes sf data frame witch shapes of lakes</p></dd>
 
 
 <dt>centroid</dt>
-<dd><p>centroid</p></dd>
+<dd><p>use centroid or polygon? (default: FALSE)</p></dd>
 
 
 <dt>ee_fun</dt>
-<dd><p>ee_fun</p></dd>
+<dd><p>spatial aggregation function (default: rgee::ee$Reducer$mean())</p></dd>
+
+
+<dt>scale</dt>
+<dd><p>scale parameter (default: 10), for details, see
+<a href="https://developers.google.com/earth-engine/guides/scale" class="external-link">https://developers.google.com/earth-engine/guides/scale</a></p></dd>
 
 
 <dt>via</dt>
-<dd><p>via</p></dd>
+<dd><p>via (default: "getInfo"), other options use google cloud storage</p></dd>
 
 
 <dt>col_lakename</dt>
-<dd><p>col_lakename</p></dd>
+<dd><p>col_lakename ("GEWNAME", used by Berlin authority for surface
+water bodies)</p></dd>
 
 
 <dt>debug</dt>
-<dd><p>debug</p></dd>
+<dd><p>print debug messages? (default: TRUE)</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>/dev/articles/ad4gd_google-earth-engine.html</loc>
+  </url>
+  <url>
     <loc>/dev/articles/copernicus-cds.html</loc>
   </url>
   <url>
@@ -35,6 +38,9 @@
   </url>
   <url>
     <loc>/dev/reference/gee_get_data_for_years.html</loc>
+  </url>
+  <url>
+    <loc>/dev/reference/gee_get_data_for_years_parallel.html</loc>
   </url>
   <url>
     <loc>/dev/reference/gee_get_metadata.html</loc>
