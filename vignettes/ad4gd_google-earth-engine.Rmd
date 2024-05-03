@@ -126,6 +126,8 @@ lakes_malte_centroid <- kwb.satellite::gee_get_data_for_years_parallel(
   centroid = TRUE)
 )
 
+fst::write_fst(lakes_malte_centroid, "lakes_malte_centroid.fst")
+
 lakes_selected <- lakes_bb %>% 
   dplyr::filter(SEE_KZ %in% lakes_malte$SEE_KZ)
 
@@ -137,12 +139,16 @@ lakes_centroid <- kwb.satellite::gee_get_data_for_years_parallel(
   centroid = TRUE)
 )
 
+fst::write_fst(lakes_centroid, "lakes_centroid.fst")
+
 system.time(
-lakes_centroid <- kwb.satellite::gee_get_data_for_years_parallel(
+lakes_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
   years = years,
   lakes = lakes_selected,
   centroid = FALSE)
 )
+
+fst::write_fst(lakes_polygon, "lakes_polygon.fst")
 
 ```
 

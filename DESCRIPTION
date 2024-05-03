@@ -48,6 +48,7 @@ Suggests:
     covr,
     cubelyr,
     details,
+    fst,
     geojsonsf,
     knitr,
     kwb.pkgbuild,
