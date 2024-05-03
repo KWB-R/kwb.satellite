@@ -53,8 +53,9 @@ gee_get_data_for_years_parallel <- function(
 
   # Prepare parallel processing
   cl <- parallel::makeCluster(ncores,
-                              outfile = fs::path_join(debug_dir,
-                                                      "debug_parallel.txt")
+                              outfile = fs::path_join(c(debug_dir,
+                                                        "debug_parallel.txt")
+                                                      )
                               )
   on.exit(parallel::stopCluster(cl))
 
