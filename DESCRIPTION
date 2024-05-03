@@ -29,11 +29,13 @@ BugReports: https://github.com/KWB-R/kwb.satellite/issues
 Imports: 
     dplyr,
     ecmwfr,
+    fs,
     gdalUtilities,
     gdata,
     lubridate,
     kwb.utils,
     magrittr,
+    parallel,
     rgee,
     rlang,
     sf,
@@ -52,6 +54,7 @@ Suggests:
     raster,
     reticulate,
     rmarkdown,
+    sessioninfo,
     stars
 VignetteBuilder: 
     knitr

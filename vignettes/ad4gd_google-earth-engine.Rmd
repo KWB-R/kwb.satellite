@@ -75,7 +75,8 @@ baalsee <- lakes_bb[lakes_bb$SEE_NAME == "Großer Baalsee",]
 
 ### Get Satellite Data
 
-```{r satellite_data, eval = ! is_gh_actions}
+#### Single Core
+```{r satellite_data_single, eval = ! is_gh_actions}
 reticulate::use_condaenv("ad4gd")
 
 library(rgee)
@@ -83,69 +84,68 @@ library(rgee)
 rgee::ee_Initialize()
 
 system.time(
-lakes_0107_centroid <- kwb.satellite::gee_get_data_for_years(
+lakes_01_centroid <- kwb.satellite::gee_get_data_for_years(
   years = 2018:2019,
   lakes = lakes_berlin[1, ],
   #bands = NULL,
   centroid = TRUE)
 )
 
+dat <- lakes_01_centroid$centroid_mean_2018$data$satellite_data[[1]] %>% 
+  dplyr::bind_cols(
+    lakes_01_centroid$centroid_mean_2018$data$satellite_metadata[[1]]
+  )
 
-if(FALSE) {
-min_size_for_parallel = 10L
 
-# Should we do parallel processing?
-doParallel <- length(lakes_berlin) >= min_size_for_parallel && 
-  (ncores <- parallel::detectCores() - 1L) > 1L
-
-sat_data <- if (doParallel) {
-      (ncores <- parallel::detectCores() - 1L) 
-      # Prepare parallel processing
-      cl <- parallel::makeCluster(ncores)
-      on.exit(parallel::stopCluster(cl))
-      
-
-      
-     parallel_fun <- function(idx, geo) {
-       lakes <- geo[idx,]
-       print(lakes)
-       reticulate::use_condaenv("ad4gd")
-       rgee::ee_Initialize()
-       kwb.satellite::gee_get_data_for_years(years = 2018, 
-                                lakes = lakes,
-                                #bands = NULL,
-                                centroid = TRUE
-       )
-     }
-     
-     parallel::clusterExport(cl = cl, varlist = c("lakes_berlin"))
-            
-      
-       kwb.utils::catAndRun(
-        sprintf(
-          "Downloading satellite data for %d lakes in parallel on %d cores",
-          nrow(lakes_berlin),
-          ncores
-        ),
-        expr = {
-          # Call the call_with_data function in a (parallel) loop
-          parallel::parLapply(cl,
-                              list(idx = 1:7, geo = lakes_berlin),
-                              fun = function(inputs) {
-                              parallel_fun(inputs$idx, inputs$geo)
-                                })
-
-        }
-      )
-
-    } else {
-      #do nothing
-    }
-
-}
-
+dat %>% 
+ggplot2::ggplot(ggplot2::aes(x = datetime_start,
+                            y = MEAN_SOLAR_AZIMUTH_ANGLE,
+                            col = tile_id)) +
+  ggplot2::geom_point() +
+  ggplot2::geom_line() +
+  ggplot2::theme_bw()
 
 ```
+
+#### Multi Core
+
+```{r satellite_data_multi, eval = ! is_gh_actions}
+
+csv_path <- system.file("extdata/lakes_bb_malte.csv", package = "kwb.satellite")
+
+lakes_malte <- readr::read_csv(csv_path) %>% 
+  sf::st_as_sf(coords = c("long", "lat"),  crs = 4326)
+
+
+years <- 2017:2024
+
+system.time(
+lakes_malte_centroid <- kwb.satellite::gee_get_data_for_years_parallel(
+  years = years,
+  lakes = lakes_malte,
+  centroid = TRUE)
+)
+
+lakes_selected <- lakes_bb %>% 
+  dplyr::filter(SEE_KZ %in% lakes_malte$SEE_KZ)
+
+
+system.time(
+lakes_centroid <- kwb.satellite::gee_get_data_for_years_parallel(
+  years = years,
+  lakes = lakes_selected,
+  centroid = TRUE)
+)
+
+system.time(
+lakes_centroid <- kwb.satellite::gee_get_data_for_years_parallel(
+  years = years,
+  lakes = lakes_selected,
+  centroid = FALSE)
+)
+
+```
+
 ## Info 
 
 ### Session Info

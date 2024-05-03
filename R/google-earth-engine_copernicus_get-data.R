@@ -22,7 +22,7 @@
 #' @export
 #' @importFrom rgee ee sf_as_ee ee_print
 #' @importFrom stringr str_remove
-#' @importFrom sf st_transform st_bbox st_as_sfc
+#' @importFrom sf st_transform st_bbox st_as_sfc st_as_sf
 #' @importFrom kwb.utils catAndRun
 #' @importFrom stats setNames
 gee_get_data_for_years <- function(years = 2018,
@@ -37,13 +37,18 @@ gee_get_data_for_years <- function(years = 2018,
                                    debug = TRUE,
                                    ee_print = FALSE) {
 
+  lakes_obj <- deparse(substitute(lakes))
+
+  if(! "sf" %in% class(lakes))  {
+    message(sprintf("Converting object 'lakes' = '%s'", lakes_obj))
+    lakes <- sf::st_as_sf(lakes)
+  }
+
   shape_type <- if(centroid) { "centroid"} else { "polygon"}
 
   reducer_function_name <-
     stringr::str_remove(ee_fun$getInfo()$type, pattern = "Reducer\\.")
 
-  # Definieren der Koordinaten für den Punkt (z.B. Berlin)
-  # Define an area of interest.
   lakes <- sf::st_transform(lakes, crs = 4326)
 
   lakes_boundary <- lakes %>%
@@ -133,6 +138,14 @@ gee_get_data <- function (collection,
                           col_lakename = "GEWNAME",
                           debug = TRUE) {
 
+  lakes_obj <- deparse(substitute(lakes))
+
+  if(! "sf" %in% class(lakes))  {
+    message(sprintf("Converting object 'lakes' = '%s'", lakes_obj))
+    lakes <- sf::st_as_sf(lakes)
+  }
+
+
 
   lapply(seq_len(nrow(lakes)), function(idx) {
     lake <- lakes[idx, ]
@@ -197,7 +210,7 @@ gee_get_data <- function (collection,
         band_timeseries_wide <- band_timeseries %>%
           tidyr::pivot_wider(names_from = band,
                              values_from = value) %>%
-          dplyr::mutate(geometry_filter = lake_gee)
+          dplyr::mutate(geometry_filter = rgee::ee_as_sf(lake_gee))
 
         dplyr::bind_cols(lake,
                          tidyr::nest(band_timeseries_wide,
