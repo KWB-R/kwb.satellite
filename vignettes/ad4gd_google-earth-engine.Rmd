@@ -85,7 +85,7 @@ rgee::ee_Initialize()
 
 system.time(
 lakes_01_centroid <- kwb.satellite::gee_get_data_for_years(
-  years = 2018:2019,
+  years = 2018,
   lakes = lakes_berlin[1, ],
   #bands = NULL,
   centroid = TRUE)
@@ -110,6 +110,10 @@ ggplot2::ggplot(ggplot2::aes(x = datetime_start,
 #### Multi Core
 
 ```{r satellite_data_multi, eval = ! is_gh_actions}
+reticulate::use_condaenv("ad4gd")
+library(rgee)
+rgee::ee_Initialize()
+
 
 csv_path <- system.file("extdata/lakes_bb_malte.csv", package = "kwb.satellite")
 
@@ -117,16 +121,38 @@ lakes_malte <- readr::read_csv(csv_path) %>%
   sf::st_as_sf(coords = c("long", "lat"),  crs = 4326)
 
 
-years <- 2017:2024
+years <- 2018:2024
+exp_dir <- tempdir()
 
 system.time(
-lakes_malte_centroid <- kwb.satellite::gee_get_data_for_years_parallel(
+lakes_malte_centroid <- kwb.satellite::gee_get_data_for_years(
   years = years,
-  lakes = lakes_malte,
-  centroid = TRUE)
+  lakes = lakes_malte[1,],
+  centroid = TRUE,
+  col_lakename = "SEE_NAME",
+  debug = TRUE,
+  debug_dir = exp_dir, 
+  export_dir = exp_dir)
 )
 
-fst::write_fst(lakes_malte_centroid, "lakes_malte_centroid.fst")
+saveRDS(lakes_malte_centroid, "lakes_malte_centroid.rds")
+
+
+system.time(
+lakes_malte_centroid_parallel <- kwb.satellite::gee_get_data_for_years_parallel(
+  years = years,
+  lakes = lakes_malte,
+  centroid = TRUE,
+  spatial_fun = "mean",
+  col_lakename = "SEE_NAME",
+  debug_dir = exp_dir, 
+  export_dir = exp_dir,
+  debug = TRUE)
+)
+
+saveRDS(lakes_malte_centroid_parallel,
+        fs::path_join(c(exp_dir, "lakes_malte_centroid_parallel.rds"))
+)
 
 lakes_selected <- lakes_bb %>% 
   dplyr::filter(SEE_KZ %in% lakes_malte$SEE_KZ)
@@ -136,19 +162,21 @@ system.time(
 lakes_centroid <- kwb.satellite::gee_get_data_for_years_parallel(
   years = years,
   lakes = lakes_selected,
-  centroid = TRUE)
+  centroid = TRUE,
+  col_lakename = "SEE_NAME")
 )
 
-fst::write_fst(lakes_centroid, "lakes_centroid.fst")
+saveRDS(lakes_centroid, "lakes_centroid.rds")
 
 system.time(
 lakes_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
   years = years,
   lakes = lakes_selected,
-  centroid = FALSE)
+  centroid = FALSE,
+  col_lakename = "SEE_NAME")
 )
 
-fst::write_fst(lakes_polygon, "lakes_polygon.fst")
+saveRDS(lakes_polygon, "lakes_polygon.rds")
 
 ```
 

@@ -10,12 +10,13 @@ gee_get_data_for_years(
   image_collection = "COPERNICUS/S2_SR_HARMONIZED",
   bands = as.list(c("QA60", paste0("B", 1:6))),
   centroid = FALSE,
-  ee_fun = rgee::ee$Reducer$mean(),
+  spatial_fun = "mean",
   scale = 10,
   via = "getInfo",
   col_lakename = "GEWNAME",
   debug = TRUE,
-  ee_print = FALSE
+  ee_print = FALSE,
+  convert_to_tibble = TRUE
 )
 }
 \arguments{
@@ -29,7 +30,7 @@ gee_get_data_for_years(
 
 \item{centroid}{use centroid or polygon? (default: FALSE)}
 
-\item{ee_fun}{spatial aggregation function (default: rgee::ee$Reducer$mean())}
+\item{spatial_fun}{spatial aggregation function (default: "mean")}
 
 \item{scale}{scale parameter (default: 10), for details, see
 \url{https://developers.google.com/earth-engine/guides/scale}}
@@ -42,6 +43,8 @@ or google cloud storage)}
 \item{debug}{show debug messages (default: TRUE)}
 
 \item{ee_print}{show debug messages for "ee" (default: FALSE)}
+
+\item{convert_to_tibble}{converts list to tibble (default: TRUE)}
 }
 \value{
 list with data and metadata, each of them tibbles

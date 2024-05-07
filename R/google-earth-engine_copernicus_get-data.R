@@ -5,7 +5,7 @@
 #' @param image_collection image collection (default: "COPERNICUS/S2_SR_HARMONIZED")
 #' @param bands bands
 #' @param centroid use centroid or polygon? (default: FALSE)
-#' @param ee_fun spatial aggregation function (default: rgee::ee$Reducer$mean())
+#' @param spatial_fun spatial aggregation function (default: "mean")
 #' @param scale scale parameter (default: 10), for details, see
 #' \url{https://developers.google.com/earth-engine/guides/scale}
 #' @param via via (default: "getInfo"), other options use google cloud (google drive
@@ -17,7 +17,7 @@
 #' @param col_lakename col_lakename (default: "GEWNAME")
 #' @param debug show debug messages (default: TRUE)
 #' @param ee_print show debug messages for "ee" (default: FALSE)
-#'
+#' @param convert_to_tibble converts list to tibble (default: TRUE)
 #' @return list with data and metadata, each of them tibbles
 #' @export
 #' @importFrom rgee ee sf_as_ee ee_print
@@ -30,12 +30,15 @@ gee_get_data_for_years <- function(years = 2018,
                                    image_collection = "COPERNICUS/S2_SR_HARMONIZED",
                                    bands = as.list(c("QA60", paste0("B", 1:6))),
                                    centroid = FALSE,
-                                   ee_fun = rgee::ee$Reducer$mean(),
+                                   spatial_fun = "mean",
                                    scale = 10,
                                    via = "getInfo",
                                    col_lakename = "GEWNAME",
                                    debug = TRUE,
-                                   ee_print = FALSE) {
+                                   ee_print = FALSE,
+                                   convert_to_tibble = TRUE) {
+
+  stopifnot(spatial_fun %in% names(rgee::ee$Reducer))
 
   lakes_obj <- deparse(substitute(lakes))
 
@@ -46,16 +49,13 @@ gee_get_data_for_years <- function(years = 2018,
 
   shape_type <- if(centroid) { "centroid"} else { "polygon"}
 
-  reducer_function_name <-
-    stringr::str_remove(ee_fun$getInfo()$type, pattern = "Reducer\\.")
-
   lakes <- sf::st_transform(lakes, crs = 4326)
 
   lakes_boundary <- lakes %>%
     sf::st_bbox() %>%
     sf::st_as_sfc()
 
-  stats::setNames(lapply(years, function(year) {
+  sat_dat <- stats::setNames(lapply(years, function(year) {
     start_date <- sprintf("%d-01-01", year)
     end_date <- sprintf("%d-12-31", year)
 
@@ -81,27 +81,32 @@ gee_get_data_for_years <- function(years = 2018,
                               "%d, number_of_bands: %d)"),
                        nrow(lakes),
                        year,
-                       reducer_function_name,
+                       spatial_fun,
                        n_images,
                        n_bands)
 
     kwb.utils::catAndRun(messageText = msg_txt,
                          expr = {
                            stopifnot(n_images * n_bands <= 5000)
-                           list(data = gee_get_data(collection = collection,
-                                                    lakes = lakes,
-                                                    centroid = centroid,
-                                                    ee_fun = ee_fun,
-                                                    scale = scale,
-                                                    via = via,
-                                                    col_lakename = col_lakename),
-                                metadata = list(geometry_filter = lakes_boundary,
-                                                metadata = gee_get_metadata(collection))
-                           )
+                           gee_get_data(collection = collection,
+                                        lakes = lakes,
+                                        centroid = centroid,
+                                        spatial_fun = spatial_fun,
+                                        scale = scale,
+                                        via = via,
+                                        col_lakename = col_lakename)
                          },
                          dbg = debug,
                          newLine = 1L)}),
-    nm = sprintf("%s_%s_%s", shape_type, reducer_function_name, years))
+    nm = sprintf("%s_%s_%s", shape_type, spatial_fun, years))
+
+  if(convert_to_tibble) {
+    sat_dat <- dplyr::bind_rows(sat_dat, .id = "id") %>%
+    tidyr::separate(id, into = c("shape_type", "spatial_function", "year"))
+  }
+
+  sat_dat
+
 }
 
 
@@ -110,7 +115,7 @@ gee_get_data_for_years <- function(years = 2018,
 #' @param collection collection satellite collection
 #' @param lakes lakes sf data frame witch shapes of lakes
 #' @param centroid use centroid or polygon? (default: FALSE)
-#' @param ee_fun spatial aggregation function (default: rgee::ee$Reducer$mean())
+#' @param spatial_fun spatial aggregation function (default: "mean")
 #' @param scale scale parameter (default: 10), for details, see
 #' \url{https://developers.google.com/earth-engine/guides/scale}
 #' @param via via (default: "getInfo"), other options use google cloud storage
@@ -132,11 +137,13 @@ gee_get_data_for_years <- function(years = 2018,
 gee_get_data <- function (collection,
                           lakes,
                           centroid = FALSE,
-                          ee_fun = rgee::ee$Reducer$mean(),
+                          spatial_fun = "mean",
                           scale = 10,
                           via = "getInfo",
                           col_lakename = "GEWNAME",
                           debug = TRUE) {
+
+  stopifnot(spatial_fun %in% names(rgee::ee$Reducer))
 
   lakes_obj <- deparse(substitute(lakes))
 
@@ -145,11 +152,8 @@ gee_get_data <- function (collection,
     lakes <- sf::st_as_sf(lakes)
   }
 
-
-
   lapply(seq_len(nrow(lakes)), function(idx) {
     lake <- lakes[idx, ]
-
 
     res <- kwb.utils::catAndRun(
       messageText = sprintf(
@@ -173,11 +177,10 @@ gee_get_data <- function (collection,
 
         metadata <- gee_get_metadata(collection_lake)
 
-
         image_extract <- rgee::ee_extract(
           x = collection,
           y =  lake_gee,
-          fun = ee_fun,
+          fun = rgee::ee$Reducer[[spatial_fun]](),
           scale = scale,
           sf = TRUE,
           via = via

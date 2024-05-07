@@ -5,7 +5,7 @@
 #' @param image_collection image collection (default: "COPERNICUS/S2_SR_HARMONIZED")
 #' @param bands bands
 #' @param centroid use centroid or polygon? (default: FALSE)
-#' @param ee_fun spatial aggregation function (default: rgee::ee$Reducer$mean())
+#' @param spatial_fun spatial aggregation function (default: "mean")
 #' @param scale scale parameter (default: 10), for details, see
 #' \url{https://developers.google.com/earth-engine/guides/scale}
 #' @param via via (default: "getInfo"), other options use google cloud (google drive
@@ -20,25 +20,29 @@
 #' @param debug show debug messages (default: TRUE)
 #' @param debug_dir directory where to save (default: tempdir())
 #' @param ee_print show debug messages for "ee" (default: FALSE)
+#' @param export_fst save sat data into fst object for each lake?
+#' @param export_dir directory where to save data for each lake (default: tempdir())
 #' @param ncores number of cores for parallel processinfg (default:
 #' parallel::detectCores() - 1)
-#'
+#' @param convert_to_tibble converts list to tibble (default: TRUE)
 #' @return list with data and metadata, each of them tibbles
 #' @export
 #' @importFrom parallel detectCores makeCluster stopCluster parLapply clusterEvalQ
 #' clusterExport
 #' @importFrom reticulate use_condaenv
-#' @importFromr rgee ee_Initialize
+#' @importFrom rgee ee_Initialize
 #' @importFrom fs path_join
 #' @importFrom stats setNames
 #' @importFrom kwb.utils catAndRun
+#' @importFrom doParallel registerDoParallel stopImplicitCluster
+#' @import foreach
 gee_get_data_for_years_parallel <- function(
     years = 2018,
     lakes,
     image_collection = "COPERNICUS/S2_SR_HARMONIZED",
     bands = as.list(c("QA60", paste0("B", 1:6))),
     centroid = FALSE,
-    ee_fun = rgee::ee$Reducer$mean(),
+    spatial_fun = "mean",
     scale = 10,
     via = "getInfo",
     col_lakename = "GEWNAME",
@@ -46,7 +50,18 @@ gee_get_data_for_years_parallel <- function(
     debug = TRUE,
     debug_dir = tempdir(),
     ee_print = FALSE,
-    ncores = parallel::detectCores() - 1) {
+    export_rds = TRUE,
+    export_dir = tempdir(),
+    ncores = parallel::detectCores() - 1,
+    convert_to_tibble = TRUE) {
+
+
+  shape_type <- if(centroid) { "centroid"} else { "polygon"}
+
+  # create_ad4gd_env(debug = debug)
+  # reticulate::use_condaenv("ad4gd")
+
+  stopifnot(spatial_fun %in% names(rgee::ee$Reducer))
 
   stopifnot(ncores > 1)
   stopifnot(ncores <= parallel::detectCores())
@@ -54,70 +69,92 @@ gee_get_data_for_years_parallel <- function(
   # Prepare parallel processing
   cl <- parallel::makeCluster(ncores,
                               outfile = fs::path_join(c(debug_dir,
-                                                        "debug_parallel.txt")
-                                                      )
-                              )
+                                                        "debug_parallel.txt")))
   on.exit(parallel::stopCluster(cl))
 
+  my_fun <- function(idx) {
+    if(debug) {
+      lakename <- lakes[[col_lakename]][idx]
+      tfile <- fs::path_join(c(debug_dir,
+                               sprintf("debug_parallel_%02d_%s.txt",
+                                       idx,
+                                       lakename)))
+      sink(tfile, append = FALSE)
+    }
 
+    res <- gee_get_data_for_years(
+      years = years,
+      lakes = lakes[idx,],
+      image_collection = image_collection,
+      bands = bands,
+      centroid = centroid,
+      spatial_fun = spatial_fun,
+      scale = scale,
+      via = via,
+      col_lakename = col_lakename,
+      debug =  debug,
+      ee_print = ee_print,
+      convert_to_tibble = convert_to_tibble)
+
+
+    if(debug) sink()
+
+
+    if(export_rds) {
+      rds_name <- sprintf("%s_%s_%s_%4d-%4d.rds",
+                          lakes[[col_lakename]][idx],
+                          shape_type,
+                          spatial_fun,
+                          min(years),
+                          max(years))
+
+      rds_path <- fs::path_join(c(export_dir, rds_name))
+
+      kwb.utils::catAndRun(sprintf("Exporting dataset to '%s'", rds_path),
+                           expr = { saveRDS(res, file = rds_path) }
+      )
+    }
+
+    return(res)
+  }
+
+  # Initialize necessary packages and environments on each cluster
   parallel::clusterEvalQ(cl, expr = {
     library(rgee)
     reticulate::use_condaenv("ad4gd")
     rgee::ee_Initialize()
   })
 
+  ## Export lakes to all clusters
+  #parallel::clusterExport(cl, varlist = c("lakes"))
 
-  # Exportieren der lakes Variablem an die Clusterarbeiter
-  parallel::clusterExport(cl = cl,
-                          varlist = c("lakes"))
+  # Prepare parallel processing
+  doParallel::registerDoParallel(cl)
+  library(foreach)
 
-  # Ausführen der parallelen Verarbeitung
+  # Run the parallel processing
   sat_data <- kwb.utils::catAndRun(
     sprintf(
       "Downloading satellite data for %d lakes in parallel on %d cores",
-      nrow(lakes_berlin),
+      nrow(lakes),
       ncores
     ),
     expr = {
-      # Aufrufen der parLapply-Funktion in einer (parallelen) Schleife
-      parallel::parLapply(cl,
-                          1:7,
-                          fun = function(idx) {
-                            if(debug) {
-                              lakename <- lakes[[col_lakename]][idx]
-                              tfile <- fs::path_join(c(debug_dir,
-                                              sprintf("debug_parallel_%02d_%s.txt",
-                                                      idx,
-                                                      lakename)))
-                              sink(tfile)
-                            }
+    sat_data <- foreach::foreach(idx = seq_len(nrow(lakes)),
+                                 .combine = "c") %dopar% {
+                                   my_fun(idx)
+                                   }
 
-                            res <- gee_get_data_for_years(
-                              years = 2018,
-                              lakes = lakes[idx,],
-                              image_collection = "COPERNICUS/S2_SR_HARMONIZED",
-                              bands = as.list(c("QA60", paste0("B", 1:6))),
-                              centroid = centroid,
-                              ee_fun = rgee::ee$Reducer$mean(),
-                              scale = scale,
-                              via = via,
-                              col_lakename = col_lakename,
-                              debug = debug,
-                              ee_print = ee_print)
+    # Stop parallel processing
+    doParallel::stopImplicitCluster()
 
-                            if(debug) sink()
-                            return(res)
-                          }
-                          )
+    if(set_lakenames_as_list_indices) {
+      sat_data <- setNames(sat_data, lakes[[col_lakename]])
+    }
+
+    sat_data
     },
     dbg = debug
   )
-
-
-  if(set_lakenames_as_list_indices) {
-    sat_data <- stats::setNames(sat_data, lakes[[col_lakename]])
-  }
-
-  sat_data
 
 }

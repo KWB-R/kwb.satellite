@@ -8,7 +8,7 @@ gee_get_data(
   collection,
   lakes,
   centroid = FALSE,
-  ee_fun = rgee::ee$Reducer$mean(),
+  spatial_fun = "mean",
   scale = 10,
   via = "getInfo",
   col_lakename = "GEWNAME",
@@ -22,7 +22,7 @@ gee_get_data(
 
 \item{centroid}{use centroid or polygon? (default: FALSE)}
 
-\item{ee_fun}{spatial aggregation function (default: rgee::ee$Reducer$mean())}
+\item{spatial_fun}{spatial aggregation function (default: "mean")}
 
 \item{scale}{scale parameter (default: 10), for details, see
 \url{https://developers.google.com/earth-engine/guides/scale}}

@@ -11,7 +11,7 @@ gee_get_data_for_years_parallel(
   image_collection = "COPERNICUS/S2_SR_HARMONIZED",
   bands = as.list(c("QA60", paste0("B", 1:6))),
   centroid = FALSE,
-  ee_fun = rgee::ee$Reducer$mean(),
+  spatial_fun = "mean",
   scale = 10,
   via = "getInfo",
   col_lakename = "GEWNAME",
@@ -19,7 +19,10 @@ gee_get_data_for_years_parallel(
   debug = TRUE,
   debug_dir = tempdir(),
   ee_print = FALSE,
-  ncores = parallel::detectCores() - 1
+  export_rds = TRUE,
+  export_dir = tempdir(),
+  ncores = parallel::detectCores() - 1,
+  convert_to_tibble = TRUE
 )
 }
 \arguments{
@@ -33,7 +36,7 @@ gee_get_data_for_years_parallel(
 
 \item{centroid}{use centroid or polygon? (default: FALSE)}
 
-\item{ee_fun}{spatial aggregation function (default: rgee::ee$Reducer$mean())}
+\item{spatial_fun}{spatial aggregation function (default: "mean")}
 
 \item{scale}{scale parameter (default: 10), for details, see
 \url{https://developers.google.com/earth-engine/guides/scale}}
@@ -52,8 +55,14 @@ for naming result list? (default: TRUE)}
 
 \item{ee_print}{show debug messages for "ee" (default: FALSE)}
 
+\item{export_dir}{directory where to save data for each lake (default: tempdir())}
+
 \item{ncores}{number of cores for parallel processinfg (default:
 parallel::detectCores() - 1)}
+
+\item{convert_to_tibble}{converts list to tibble (default: TRUE)}
+
+\item{export_fst}{save sat data into fst object for each lake?}
 }
 \value{
 list with data and metadata, each of them tibbles

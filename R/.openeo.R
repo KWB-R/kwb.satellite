@@ -13,6 +13,7 @@ lakes <- lakes[lakes$SEE_NAME == "Großer Baalsee",]
 
 
 lakes_boundary <- lakes %>%
+  sf::st_transform(4326) %>%
   sf::st_bbox() %>%
   sf::st_as_sfc()
 
@@ -32,8 +33,8 @@ bands <- as.list(c("QA60", sprintf("B%02d", 1:6)))
 
 data <- p$load_collection(id = colls$SENTINEL2_L2A$id,
                           spatial_extent = lakes_boundary,
-                          temporal_extent = list("2018-04-01",
-                                                 "2018-05-01"),
+                          temporal_extent = list("2020-04-01",
+                                                 "2020-05-01"),
                           bands = bands)
 
 
@@ -51,10 +52,10 @@ apply_linear_transform = p$apply(data=temporal_reduce,process = function(value,.
                        outputMax = 255)
 })
 
-result <- p$save_result(data = temporal_reduce,
-                        format = formats$output$CSV)
+result <- p$save_result(data = data,
+                        format = formats$output$netCDF)
 
-job_definition <- openeo::create_job(result, title = "Baalsee_temp-reduce")
+job_definition <- openeo::create_job(result, title = "Baalsee_raw-dat")
 
 as(object = job_definition, "Process")
 

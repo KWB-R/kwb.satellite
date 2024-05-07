@@ -28,7 +28,9 @@ URL: https://github.com/KWB-R/kwb.satellite
 BugReports: https://github.com/KWB-R/kwb.satellite/issues
 Imports: 
     dplyr,
+    doParallel,
     ecmwfr,
+    foreach,
     fs,
     gdalUtilities,
     gdata,
@@ -49,6 +51,7 @@ Suggests:
     cubelyr,
     details,
     fst,
+    geojsonio,
     geojsonsf,
     knitr,
     kwb.pkgbuild,
