@@ -1,12 +1,14 @@
 library(magrittr)
 year <- 2018
 
-lakes <- sf::read_sf("Seen25_20211105/seen25.shp")
+archive::archive_extract("https://data.geobasis-bb.de/geofachdaten/Wasser/Hydrologie/seen25.zip",
+                         dir = "lakes_bb")
+lakes_bb <- sf::read_sf("lakes_bb/Seen25_20211105/seen25.shp")
 
 start_date <- sprintf("%d-01-01", year)
 end_date <- sprintf("%d-12-31", year)
 
-lakes <- sf::st_transform(lakes, crs = 4326) %>%
+lakes <- sf::st_transform(lakes_bb, crs = 4326) %>%
   dplyr::filter(SEE_NAME != "-")
 
 lakes <- lakes[lakes$SEE_NAME == "Großer Baalsee",]
@@ -16,8 +18,6 @@ lakes_boundary <- lakes %>%
   sf::st_transform(4326) %>%
   sf::st_bbox() %>%
   sf::st_as_sfc()
-
-
 
 openeo_con <- openeo::connect(host = "https://openeo.dataspace.copernicus.eu")
 
@@ -29,13 +29,12 @@ formats <- openeo::list_file_formats()
 
 colls <- openeo::list_collections()
 
-bands <- as.list(c("QA60", sprintf("B%02d", 1:6)))
+bands <- as.list(c("CLD", sprintf("B%02d", 1:6)))
 
 data <- p$load_collection(id = colls$SENTINEL2_L2A$id,
                           spatial_extent = lakes_boundary,
                           temporal_extent = list("2020-04-01",
-                                                 "2020-05-01"),
-                          bands = bands)
+                                                 "2020-05-01"))
 
 
 temporal_reduce = p$reduce_dimension(data = data,
@@ -55,11 +54,23 @@ apply_linear_transform = p$apply(data=temporal_reduce,process = function(value,.
 result <- p$save_result(data = data,
                         format = formats$output$netCDF)
 
-job_definition <- openeo::create_job(result, title = "Baalsee_raw-dat")
+job_definition <- openeo::create_job(result, title = "Baalsee_raw_all-bands_netCDF")
 
 as(object = job_definition, "Process")
 
 
 jobs <- openeo::list_jobs()
+jobs
 openeo::start_job(job = job_definition$id, log = TRUE)
 openeo::describe_job(job_definition$id)
+netcdf_path <- openeo::download_results(job = "j-240507ab222b45dfa9a65009ad7ed937",
+                                        folder = "./openeo_netcdf")
+
+dat <- ncdf4::nc_open(res[[1]])
+
+dat$dim$t
+
+View(dat)
+
+
+result_path <- openeo::download_results(job = job_definition$id, folder = "./openeo")
