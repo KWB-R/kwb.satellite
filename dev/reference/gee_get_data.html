@@ -63,7 +63,7 @@
 <span>  <span class="va">collection</span>,</span>
 <span>  <span class="va">lakes</span>,</span>
 <span>  centroid <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  ee_fun <span class="op">=</span> <span class="fu">rgee</span><span class="fu">::</span><span class="va"><a href="https://r-spatial.github.io/rgee/reference/ee.html" class="external-link">ee</a></span><span class="op">$</span><span class="va">Reducer</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  spatial_fun <span class="op">=</span> <span class="st">"mean"</span>,</span>
 <span>  scale <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  via <span class="op">=</span> <span class="st">"getInfo"</span>,</span>
 <span>  col_lakename <span class="op">=</span> <span class="st">"GEWNAME"</span>,</span>
@@ -85,8 +85,8 @@
 <dd><p>use centroid or polygon? (default: FALSE)</p></dd>
 
 
-<dt>ee_fun</dt>
-<dd><p>spatial aggregation function (default: rgee::ee$Reducer$mean())</p></dd>
+<dt>spatial_fun</dt>
+<dd><p>spatial aggregation function (default: "mean")</p></dd>
 
 
 <dt>scale</dt>

@@ -34,6 +34,9 @@
     <loc>/dev/reference/copernicus_cds_parallel.html</loc>
   </url>
   <url>
+    <loc>/dev/reference/create_ad4gd_env.html</loc>
+  </url>
+  <url>
     <loc>/dev/reference/gee_get_data.html</loc>
   </url>
   <url>
@@ -47,6 +50,9 @@
   </url>
   <url>
     <loc>/dev/reference/get_metadata_era5.html</loc>
+  </url>
+  <url>
+    <loc>/dev/reference/import_rds.html</loc>
   </url>
   <url>
     <loc>/dev/reference/index.html</loc>

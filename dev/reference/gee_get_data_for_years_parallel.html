@@ -65,7 +65,7 @@
 <span>  image_collection <span class="op">=</span> <span class="st">"COPERNICUS/S2_SR_HARMONIZED"</span>,</span>
 <span>  bands <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"QA60"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"B"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  centroid <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  ee_fun <span class="op">=</span> <span class="fu">rgee</span><span class="fu">::</span><span class="va"><a href="https://r-spatial.github.io/rgee/reference/ee.html" class="external-link">ee</a></span><span class="op">$</span><span class="va">Reducer</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  spatial_fun <span class="op">=</span> <span class="st">"mean"</span>,</span>
 <span>  scale <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  via <span class="op">=</span> <span class="st">"getInfo"</span>,</span>
 <span>  col_lakename <span class="op">=</span> <span class="st">"GEWNAME"</span>,</span>
@@ -73,7 +73,10 @@
 <span>  debug <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  debug_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  ee_print <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  ncores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span>
+<span>  export_rds <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  export_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  ncores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>,</span>
+<span>  convert_to_tibble <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -99,8 +102,8 @@
 <dd><p>use centroid or polygon? (default: FALSE)</p></dd>
 
 
-<dt>ee_fun</dt>
-<dd><p>spatial aggregation function (default: rgee::ee$Reducer$mean())</p></dd>
+<dt>spatial_fun</dt>
+<dd><p>spatial aggregation function (default: "mean")</p></dd>
 
 
 <dt>scale</dt>
@@ -134,9 +137,21 @@ for naming result list? (default: TRUE)</p></dd>
 <dd><p>show debug messages for "ee" (default: FALSE)</p></dd>
 
 
+<dt>export_dir</dt>
+<dd><p>directory where to save data for each lake (default: tempdir())</p></dd>
+
+
 <dt>ncores</dt>
 <dd><p>number of cores for parallel processinfg (default:
 parallel::detectCores() - 1)</p></dd>
+
+
+<dt>convert_to_tibble</dt>
+<dd><p>converts list to tibble (default: TRUE)</p></dd>
+
+
+<dt>export_fst</dt>
+<dd><p>save sat data into fst object for each lake?</p></dd>
 
 </dl></div>
     <div class="section level2">
