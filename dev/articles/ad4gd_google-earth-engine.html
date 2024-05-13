@@ -107,7 +107,7 @@ Rustler</h4>
 <span><span class="co">#&gt; package 'kwb.python' successfully unpacked and MD5 sums checked</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The downloaded binary packages are in</span></span>
-<span><span class="co">#&gt;  C:\Users\runneradmin\AppData\Local\Temp\Rtmp0YHCZP\downloaded_packages</span></span>
+<span><span class="co">#&gt;  C:\Users\runneradmin\AppData\Local\Temp\RtmpuGiCKy\downloaded_packages</span></span>
 <span></span>
 <span></span>
 <span><span class="co">### Downgrade to last one supplied by R package "rgee"</span></span>
@@ -116,7 +116,7 @@ Rustler</h4>
 <span>                                                  py <span class="op">=</span> <span class="st">"earthengine-api==0.1.370"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; * Installing Miniconda -- please wait a moment ...</span></span>
 <span><span class="co">#&gt; * Downloading "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe" ...</span></span>
-<span><span class="co">#&gt; + "C:\Users\runneradmin\AppData\Local\Temp\Rtmp0YHCZP\Miniconda3-latest-Windows-x86_64.exe" /InstallationType=JustMe /AddToPath=0 /RegisterPython=0 /NoRegistry=1 /S /D=C:\Users\runneradmin\AppData\Local\r-miniconda</span></span>
+<span><span class="co">#&gt; + "C:\Users\runneradmin\AppData\Local\Temp\RtmpuGiCKy\Miniconda3-latest-Windows-x86_64.exe" /InstallationType=JustMe /AddToPath=0 /RegisterPython=0 /NoRegistry=1 /S /D=C:\Users\runneradmin\AppData\Local\r-miniconda</span></span>
 <span><span class="co">#&gt; + "C:/Users/runneradmin/AppData/Local/r-miniconda/condabin/conda.bat" update --yes --name base conda</span></span>
 <span><span class="co">#&gt; + "C:/Users/runneradmin/AppData/Local/r-miniconda/condabin/conda.bat" create --yes --name r-reticulate "python=3.10" numpy --quiet -c conda-forge</span></span>
 <span><span class="co">#&gt; * Miniconda has been successfully installed at "C:/Users/runneradmin/AppData/Local/r-miniconda".</span></span>
@@ -217,28 +217,25 @@ Rustler</h4>
 <span><span class="va">lakes_malte</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">(</span><span class="va">csv_path</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span>coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"long"</span>, <span class="st">"lat"</span><span class="op">)</span>,  crs <span class="op">=</span> <span class="fl">4326</span><span class="op">)</span></span>
 <span></span>
-<span></span>
-<span><span class="va">years</span> <span class="op">&lt;-</span> <span class="fl">2018</span><span class="op">:</span><span class="fl">2024</span></span>
+<span><span class="va">years</span> <span class="op">&lt;-</span> <span class="fl">2017</span><span class="op">:</span><span class="fl">2024</span></span>
 <span><span class="va">exp_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">kwb.utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kwb.utils/man/hsOpenWindowsExplorer.html" class="external-link">hsOpenWindowsExplorer</a></span><span class="op">(</span><span class="va">exp_dir</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
 <span><span class="va">lakes_malte_centroid</span> <span class="op">&lt;-</span> <span class="fu">kwb.satellite</span><span class="fu">::</span><span class="fu"><a href="../reference/gee_get_data_for_years.html">gee_get_data_for_years</a></span><span class="op">(</span></span>
 <span>  years <span class="op">=</span> <span class="va">years</span>,</span>
-<span>  lakes <span class="op">=</span> <span class="va">lakes_malte</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>,</span>
+<span>  lakes <span class="op">=</span> <span class="va">lakes_malte</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span>,</span>
 <span>  centroid <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  col_lakename <span class="op">=</span> <span class="st">"SEE_NAME"</span>,</span>
-<span>  debug <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  debug_dir <span class="op">=</span> <span class="va">exp_dir</span>, </span>
-<span>  export_dir <span class="op">=</span> <span class="va">exp_dir</span><span class="op">)</span></span>
+<span>  debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">lakes_malte_centroid</span>, <span class="st">"lakes_malte_centroid.rds"</span><span class="op">)</span></span>
 <span></span>
-<span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
 <span><span class="va">lakes_malte_centroid_parallel</span> <span class="op">&lt;-</span> <span class="fu">kwb.satellite</span><span class="fu">::</span><span class="fu"><a href="../reference/gee_get_data_for_years_parallel.html">gee_get_data_for_years_parallel</a></span><span class="op">(</span></span>
 <span>  years <span class="op">=</span> <span class="va">years</span>,</span>
-<span>  lakes <span class="op">=</span> <span class="va">lakes_malte</span>,</span>
+<span>  lakes <span class="op">=</span> <span class="va">lakes_malte</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">7</span>,<span class="op">]</span>,</span>
 <span>  centroid <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  spatial_fun <span class="op">=</span> <span class="st">"mean"</span>,</span>
 <span>  col_lakename <span class="op">=</span> <span class="st">"SEE_NAME"</span>,</span>
@@ -297,7 +294,7 @@ Rustler</h4>
 <span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a> collate  English_United States.utf8</span>
 <span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a> ctype    English_United States.utf8</span>
 <span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a> tz       UTC</span>
-<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a> date     <span class="dv">2024-05-07</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a> date     <span class="dv">2024-05-13</span></span>
 <span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a> pandoc   <span class="dv">3</span>.<span class="fl">1.11</span> <span class="sc">@</span> C<span class="sc">:</span><span class="er">/</span>HOSTED<span class="sc">~</span><span class="dv">1</span><span class="sc">/</span>windows<span class="sc">/</span>pandoc<span class="sc">/</span><span class="dv">31</span>F387<span class="sc">~</span><span class="fl">1.11</span><span class="sc">/</span>x64<span class="sc">/</span>PANDOC<span class="sc">~</span><span class="fl">1.11</span><span class="sc">/</span> (via rmarkdown)</span>
 <span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a></span>
 <span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a> [<span class="dv">1</span>m [<span class="dv">36</span>m─ Packages ─────────────────────────────────────────────────────────────────── [<span class="dv">39</span>m [<span class="dv">22</span>m</span>
@@ -433,7 +430,7 @@ Rustler</h4>
 <span id="cb9-40"><a href="#cb9-40" tabindex="-1"></a>      <span class="sc">-</span> charset<span class="sc">-</span>normalizer<span class="sc">==</span><span class="dv">3</span>.<span class="fl">3.2</span></span>
 <span id="cb9-41"><a href="#cb9-41" tabindex="-1"></a>      <span class="sc">-</span> earthengine<span class="sc">-</span>api<span class="sc">==</span><span class="dv">0</span>.<span class="fl">1.370</span></span>
 <span id="cb9-42"><a href="#cb9-42" tabindex="-1"></a>      <span class="sc">-</span> google<span class="sc">-</span>api<span class="sc">-</span>core<span class="sc">==</span><span class="dv">2</span>.<span class="fl">19.0</span></span>
-<span id="cb9-43"><a href="#cb9-43" tabindex="-1"></a>      <span class="sc">-</span> google<span class="sc">-</span>api<span class="sc">-</span>python<span class="sc">-</span>client<span class="sc">==</span><span class="dv">2</span>.<span class="fl">127.0</span></span>
+<span id="cb9-43"><a href="#cb9-43" tabindex="-1"></a>      <span class="sc">-</span> google<span class="sc">-</span>api<span class="sc">-</span>python<span class="sc">-</span>client<span class="sc">==</span><span class="dv">2</span>.<span class="fl">129.0</span></span>
 <span id="cb9-44"><a href="#cb9-44" tabindex="-1"></a>      <span class="sc">-</span> google<span class="sc">-</span>auth<span class="sc">==</span><span class="dv">2</span>.<span class="fl">29.0</span></span>
 <span id="cb9-45"><a href="#cb9-45" tabindex="-1"></a>      <span class="sc">-</span> google<span class="sc">-</span>auth<span class="sc">-</span>httplib2<span class="sc">==</span><span class="dv">0</span>.<span class="fl">2.0</span></span>
 <span id="cb9-46"><a href="#cb9-46" tabindex="-1"></a>      <span class="sc">-</span> google<span class="sc">-</span>cloud<span class="sc">-</span>core<span class="sc">==</span><span class="dv">2</span>.<span class="fl">4.1</span></span>

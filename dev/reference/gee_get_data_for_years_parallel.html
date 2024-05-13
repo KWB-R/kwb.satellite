@@ -76,7 +76,7 @@
 <span>  export_rds <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  export_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  convert_to_tibble <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  n_year_splits <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -146,8 +146,9 @@ for naming result list? (default: TRUE)</p></dd>
 parallel::detectCores() - 1)</p></dd>
 
 
-<dt>convert_to_tibble</dt>
-<dd><p>converts list to tibble (default: TRUE)</p></dd>
+<dt>n_year_splits</dt>
+<dd><p>number of year splits per request. Required in case request
+uses too much images &gt; 400-500 per year (default: 2)</p></dd>
 
 
 <dt>export_fst</dt>

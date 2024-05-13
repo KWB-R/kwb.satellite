@@ -71,7 +71,7 @@
 <span>  col_lakename <span class="op">=</span> <span class="st">"GEWNAME"</span>,</span>
 <span>  debug <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ee_print <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  convert_to_tibble <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  n_year_splits <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -112,19 +112,21 @@ or google cloud storage)</p></dd>
 
 
 <dt>col_lakename</dt>
-<dd><p>col_lakename (default: "GEWNAME")</p></dd>
+<dd><p>col_lakename ("GEWNAME", used by Berlin authority for surface
+water bodies)</p></dd>
 
 
 <dt>debug</dt>
-<dd><p>show debug messages (default: TRUE)</p></dd>
+<dd><p>print debug messages? (default: TRUE)</p></dd>
 
 
 <dt>ee_print</dt>
 <dd><p>show debug messages for "ee" (default: FALSE)</p></dd>
 
 
-<dt>convert_to_tibble</dt>
-<dd><p>converts list to tibble (default: TRUE)</p></dd>
+<dt>n_year_splits</dt>
+<dd><p>number of year splits per request. Required in case request
+uses too much images &gt; 400-500 per year (default: 2)</p></dd>
 
 </dl></div>
     <div class="section level2">
