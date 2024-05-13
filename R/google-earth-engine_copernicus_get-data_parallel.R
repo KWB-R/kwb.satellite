@@ -24,7 +24,8 @@
 #' @param export_dir directory where to save data for each lake (default: tempdir())
 #' @param ncores number of cores for parallel processinfg (default:
 #' parallel::detectCores() - 1)
-#' @param convert_to_tibble converts list to tibble (default: TRUE)
+#' @param n_year_splits  number of year splits per request. Required in case request
+#' uses too much images > 400-500 per year (default: 2)
 #' @return list with data and metadata, each of them tibbles
 #' @export
 #' @importFrom parallel detectCores makeCluster stopCluster parLapply clusterEvalQ
@@ -53,7 +54,7 @@ gee_get_data_for_years_parallel <- function(
     export_rds = TRUE,
     export_dir = tempdir(),
     ncores = parallel::detectCores() - 1,
-    convert_to_tibble = TRUE) {
+    n_year_splits = 2) {
 
 
   shape_type <- if(centroid) { "centroid"} else { "polygon"}
@@ -94,7 +95,7 @@ gee_get_data_for_years_parallel <- function(
       col_lakename = col_lakename,
       debug =  debug,
       ee_print = ee_print,
-      convert_to_tibble = convert_to_tibble)
+      n_year_splits = n_year_splits)
 
 
     if(debug) sink()

@@ -16,7 +16,7 @@ gee_get_data_for_years(
   col_lakename = "GEWNAME",
   debug = TRUE,
   ee_print = FALSE,
-  convert_to_tibble = TRUE
+  n_year_splits = 2
 )
 }
 \arguments{
@@ -38,13 +38,15 @@ gee_get_data_for_years(
 \item{via}{via (default: "getInfo"), other options use google cloud (google drive
 or google cloud storage)}
 
-\item{col_lakename}{col_lakename (default: "GEWNAME")}
+\item{col_lakename}{col_lakename ("GEWNAME", used by Berlin authority for surface
+water bodies)}
 
-\item{debug}{show debug messages (default: TRUE)}
+\item{debug}{print debug messages? (default: TRUE)}
 
 \item{ee_print}{show debug messages for "ee" (default: FALSE)}
 
-\item{convert_to_tibble}{converts list to tibble (default: TRUE)}
+\item{n_year_splits}{number of year splits per request. Required in case request
+uses too much images > 400-500 per year (default: 2)}
 }
 \value{
 list with data and metadata, each of them tibbles

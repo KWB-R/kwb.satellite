@@ -120,28 +120,25 @@ csv_path <- system.file("extdata/lakes_bb_malte.csv", package = "kwb.satellite")
 lakes_malte <- readr::read_csv(csv_path) %>% 
   sf::st_as_sf(coords = c("long", "lat"),  crs = 4326)
 
-
-years <- 2018:2024
+years <- 2017:2024
 exp_dir <- tempdir()
+kwb.utils::hsOpenWindowsExplorer(exp_dir)
 
 system.time(
 lakes_malte_centroid <- kwb.satellite::gee_get_data_for_years(
   years = years,
-  lakes = lakes_malte[1,],
+  lakes = lakes_malte[2,],
   centroid = TRUE,
   col_lakename = "SEE_NAME",
-  debug = TRUE,
-  debug_dir = exp_dir, 
-  export_dir = exp_dir)
+  debug = TRUE)
 )
 
 saveRDS(lakes_malte_centroid, "lakes_malte_centroid.rds")
 
-
 system.time(
 lakes_malte_centroid_parallel <- kwb.satellite::gee_get_data_for_years_parallel(
   years = years,
-  lakes = lakes_malte,
+  lakes = lakes_malte[1:7,],
   centroid = TRUE,
   spatial_fun = "mean",
   col_lakename = "SEE_NAME",

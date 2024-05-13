@@ -13,11 +13,9 @@
 #' @param col_lakename col_lakename ("GEWNAME", used by Berlin authority for surface
 #' water bodies)
 #' @param debug print debug messages? (default: TRUE)
-#'
-#' @param col_lakename col_lakename (default: "GEWNAME")
-#' @param debug show debug messages (default: TRUE)
 #' @param ee_print show debug messages for "ee" (default: FALSE)
-#' @param convert_to_tibble converts list to tibble (default: TRUE)
+#' @param n_year_splits  number of year splits per request. Required in case request
+#' uses too much images > 400-500 per year (default: 2)
 #' @return list with data and metadata, each of them tibbles
 #' @export
 #' @importFrom rgee ee sf_as_ee ee_print
@@ -36,7 +34,7 @@ gee_get_data_for_years <- function(years = 2018,
                                    col_lakename = "GEWNAME",
                                    debug = TRUE,
                                    ee_print = FALSE,
-                                   convert_to_tibble = TRUE) {
+                                   n_year_splits = 2) {
 
   stopifnot(spatial_fun %in% names(rgee::ee$Reducer))
 
@@ -55,17 +53,19 @@ gee_get_data_for_years <- function(years = 2018,
     sf::st_bbox() %>%
     sf::st_as_sfc()
 
-  sat_dat <- stats::setNames(lapply(years, function(year) {
-    start_date <- sprintf("%d-01-01", year)
-    end_date <- sprintf("%d-12-31", year)
+  lapply(years, function(year) {
 
-    collection <- rgee::ee$ImageCollection(image_collection)
+    dates <- split_year(year, n_year_splits)
 
-    if(!is.null(bands)) collection <- collection$select(bands)
+    sat_dat_year <- lapply(seq_len(nrow(dates)), function(idx) {
 
-    collection <- collection$
-      filterBounds(rgee::sf_as_ee(lakes_boundary))$
-      filterDate(start_date, end_date)
+      collection <- rgee::ee$ImageCollection(image_collection)
+
+      if(!is.null(bands)) collection <- collection$select(bands)
+
+      collection <- collection$
+        filterBounds(rgee::sf_as_ee(lakes_boundary))$
+        filterDate(dates$start[idx], dates$end[idx])
 
     if (debug && ee_print) {
       rgee::ee_print(collection) # Useful for debugging.
@@ -76,11 +76,16 @@ gee_get_data_for_years <- function(years = 2018,
     n_images <-  length(dat$features)
     n_bands <- length(dat$features[[1]]$bands)
 
-    msg_txt <- sprintf(paste0("Downloading data for %d lake(s) for year '%d' and",
+    stopifnot(n_images > 0)
+    stopifnot(n_bands > 0)
+
+    msg_txt <- sprintf(paste0("Downloading data for %d lake(s) for year '%d' (%s - %s) and",
                               " spatial aggregation function '%s' (number_of_images:",
                               "%d, number_of_bands: %d)"),
                        nrow(lakes),
                        year,
+                       dates$start[idx],
+                       dates$end[idx],
                        spatial_fun,
                        n_images,
                        n_bands)
@@ -94,18 +99,20 @@ gee_get_data_for_years <- function(years = 2018,
                                         spatial_fun = spatial_fun,
                                         scale = scale,
                                         via = via,
-                                        col_lakename = col_lakename)
+                                        col_lakename = col_lakename) %>%
+                             dplyr::bind_cols(tibble::tibble(
+                               date_start = dates$start[idx],
+                               date_end = dates$end[idx]),
+                               shape_type = shape_type,
+                               spatial_fun = spatial_fun,
+                               year = year)
                          },
                          dbg = debug,
-                         newLine = 1L)}),
-    nm = sprintf("%s_%s_%s", shape_type, spatial_fun, years))
-
-  if(convert_to_tibble) {
-    sat_dat <- dplyr::bind_rows(sat_dat, .id = "id") %>%
-    tidyr::separate(id, into = c("shape_type", "spatial_function", "year"))
-  }
-
-  sat_dat
+                         newLine = 1L)
+    }) %>%
+      dplyr::bind_rows()
+    })  %>%
+    dplyr::bind_rows()
 
 }
 
