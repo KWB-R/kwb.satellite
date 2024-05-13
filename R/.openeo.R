@@ -11,11 +11,11 @@ end_date <- sprintf("%d-12-31", year)
 lakes <- sf::st_transform(lakes_bb, crs = 4326) %>%
   dplyr::filter(SEE_NAME != "-")
 
-lakes <- lakes[lakes$SEE_NAME == "Großer Baalsee",]
+lakes <- lakes[lakes$SEE_NAME == "Großer Baalsee",] %>%
+  sf::st_transform(4326)
 
 
 lakes_boundary <- lakes %>%
-  sf::st_transform(4326) %>%
   sf::st_bbox() %>%
   sf::st_as_sfc()
 
@@ -32,7 +32,7 @@ colls <- openeo::list_collections()
 bands <- as.list(c("CLD", sprintf("B%02d", 1:6)))
 
 data <- p$load_collection(id = colls$SENTINEL2_L2A$id,
-                          spatial_extent = lakes_boundary,
+                          spatial_extent = lakes,
                           temporal_extent = list("2020-04-01",
                                                  "2020-05-01"))
 
@@ -63,14 +63,13 @@ jobs <- openeo::list_jobs()
 jobs
 openeo::start_job(job = job_definition$id, log = TRUE)
 openeo::describe_job(job_definition$id)
-netcdf_path <- openeo::download_results(job = "j-240507ab222b45dfa9a65009ad7ed937",
+netcdf_path <- openeo::download_results(job = job_definition$id,
                                         folder = "./openeo_netcdf")
 
-dat <- ncdf4::nc_open(res[[1]])
+dat <- ncdf4::nc_open(netcdf_path[[1]])
 
 dat$dim$t
 
 View(dat)
 
-
-result_path <- openeo::download_results(job = job_definition$id, folder = "./openeo")
+b01_mat <- ncdf4::ncvar_get(dat, varid = "B01")

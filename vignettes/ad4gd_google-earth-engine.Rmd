@@ -138,7 +138,7 @@ saveRDS(lakes_malte_centroid, "lakes_malte_centroid.rds")
 system.time(
 lakes_malte_centroid_parallel <- kwb.satellite::gee_get_data_for_years_parallel(
   years = years,
-  lakes = lakes_malte[1:7,],
+  lakes = lakes_malte,
   centroid = TRUE,
   spatial_fun = "mean",
   col_lakename = "SEE_NAME",
@@ -156,24 +156,33 @@ lakes_selected <- lakes_bb %>%
 
 
 system.time(
-lakes_centroid <- kwb.satellite::gee_get_data_for_years_parallel(
+lakes_bb_centroid <- kwb.satellite::gee_get_data_for_years_parallel(
   years = years,
   lakes = lakes_selected,
   centroid = TRUE,
-  col_lakename = "SEE_NAME")
+  col_lakename = "SEE_NAME",
+  spatial_fun = "mean",
+  col_lakename = "SEE_NAME",
+  debug_dir = exp_dir, 
+  export_dir = exp_dir,
+  debug = TRUE)
 )
 
-saveRDS(lakes_centroid, "lakes_centroid.rds")
+saveRDS(lakes_bb_centroid, "lakes_bb_centroid.rds")
 
 system.time(
 lakes_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
   years = years,
   lakes = lakes_selected,
   centroid = FALSE,
-  col_lakename = "SEE_NAME")
+  spatial_fun = "mean",
+  col_lakename = "SEE_NAME",
+  debug_dir = exp_dir, 
+  export_dir = exp_dir,
+  debug = TRUE)
 )
 
-saveRDS(lakes_polygon, "lakes_polygon.rds")
+saveRDS(lakes_bb_polygon, "lakes_bb_polygon.rds")
 
 ```
 

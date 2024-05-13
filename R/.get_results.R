@@ -37,50 +37,72 @@ tmp <- dat[1, ]$satellite_metadata[[1]][[84]][[1]]
 coords_list <- convert_to_list(tmp$`system:footprint`$coordinates)
 sat_meta <- sf::st_polygon(coords_list)
 
-
-
-sat_data_list <- kwb.satellite::import_rds(rds_dir = "C:/Users/mrustl/AppData/Local/Temp/Rtmpmsvbqy")
+sat_data_list <- kwb.satellite::import_rds(rds_dir = "C:/Users/mrustl/AppData/Local/Temp/Rtmpkv5MPc")
 sat_data <- dplyr::bind_rows(sat_data_list)
 View(sat_data)
 
-sat_data_unnest1 <- tidyr::unnest(sat_data, satellite_data)
-sat_data_unnest2 <- tidyr::unnest(sat_data, c(satellite_data, satellite_metadata),
-                                  names_sep = ".")
+sat_meta_unnest <- tidyr::unnest(sat_data,
+                             c("satellite_data", "satellite_metadata"),
+                             names_sep = ".")
 
+
+coords <- lapply(seq_len(nrow(sat_meta_unnest)), function(idx) {
+convert_to_list(sat_meta_unnest$satellite_metadata.geometry[[idx]]$`system:footprint`$coordinates) %>%
+  sf::st_polygon()
+})
+
+sat_meta_unnest$coords <- coords
 
 archive::archive_extract("https://data.geobasis-bb.de/geofachdaten/Wasser/Hydrologie/seen25.zip",
                          dir = "lakes_bb")
 lakes_bb <- sf::read_sf("lakes_bb/Seen25_20211105/seen25.shp")
 
-sat_data_unnest2_meta <- dplyr::left_join(sat_data_unnest2,
+sat_meta_unnest <- dplyr::left_join(sat_meta_unnest,
                  lakes_bb[,c("SEE_KZ", "geometry")] %>%
                    dplyr::rename(geometry_bb = geometry) %>%
                    dplyr::mutate(SEE_KZ = as.double(SEE_KZ)) %>%
                    as.data.frame(),
                  by = "SEE_KZ")
 
-seq_images <- seq_along(sat_data_unnest2_meta$satellite_metadata.geometry)
+sat_meta_unnest$geometry_bb <- sf::st_transform(sat_meta_unnest$geometry_bb,
+                                                crs = 4326)
 
-sat_multi_coors <- lapply(seq_images, function(i) {
-  convert_to_list(
-  sat_data_unnest2_meta$satellite_metadata.geometry[[i]]$`system:footprint`$coordinates
-  ) %>% sf::st_polygon()
-  })
+sat_meta_unnest$geometry_bb_centroid <- sf::st_centroid(sat_meta_unnest$geometry_bb)
 
-View(sat_multi_coors)
+seq_images <- seq_along(sat_meta_unnest$satellite_metadata.geometry)
 
-for(i in seq_images) {
-sat_multi_coors[[i]] %>%
+# sat_multi_coors <- lapply(seq_images, function(i) {
+#   convert_to_list(
+#   sat_data_unnest2_meta$satellite_metadata.geometry[[i]]$`system:footprint`$coordinates
+#   ) %>% sf::st_polygon()
+#   })
+#
+# View(sat_multi_coors)
+
+
+see_name <- unique(sat_meta_unnest$SEE_NAME)[order(unique(sat_meta_unnest$SEE_NAME))]
+
+# for(i in seq_images) {
+for(see in see_name) {
+dat <- sat_meta_unnest[sat_meta_unnest$SEE_NAME == see,] %>%
+  dplyr::first()
+
+i <- 1
+
+dat %>%
 leaflet::leaflet() %>%
   leaflet::addTiles() %>%
   leaflet::addProviderTiles(leaflet::providers$CartoDB.Positron) %>%
   leaflet::addPolygons(
-    color = "red"
+    color = "red",
+    data = dat$coords[[i]]
   ) %>%
   leaflet::addCircles(color = "blue",
-                       data = sat_data_unnest2_meta$satellite_data.geometry_filter$geometry[[i]]) %>%
+                       data = dat$geometry[[i]]) %>%
+    leaflet::addCircles(color = "lightblue",
+                        data = dat$geometry_bb_centroid[[i]]) %>%
   leaflet::addPolygons(color = "green",
-                       data = sf::st_transform(sat_data_unnest2_meta$geometry_bb[i], crs = 4326)) %>%
+                       data = dat$geometry_bb[[i]]) %>%
   print()
   kwb.base::hsWait(0.5)
 }
