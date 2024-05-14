@@ -14,7 +14,7 @@ dependencies:
   - libiconv=1.17=hcfcfb64_2
   - liblapack=3.9.0=22_win64_mkl
   - libsqlite=3.45.3=hcfcfb64_0
-  - libxml2=2.12.6=hc3477c8_2
+  - libxml2=2.12.7=h283a6d9_0
   - libzlib=1.2.13=hcfcfb64_5
   - mkl=2024.1.0=h66d3029_692
   - numpy=1.26.4=py312h8753938_0

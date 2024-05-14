@@ -107,7 +107,7 @@ Rustler</h4>
 <span><span class="co">#&gt; package 'kwb.python' successfully unpacked and MD5 sums checked</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The downloaded binary packages are in</span></span>
-<span><span class="co">#&gt;  C:\Users\runneradmin\AppData\Local\Temp\RtmpWyxwNg\downloaded_packages</span></span>
+<span><span class="co">#&gt;  C:\Users\runneradmin\AppData\Local\Temp\RtmpAj7Hnv\downloaded_packages</span></span>
 <span></span>
 <span></span>
 <span><span class="co">### Downgrade to last one supplied by R package "rgee"</span></span>
@@ -116,7 +116,7 @@ Rustler</h4>
 <span>                                                  py <span class="op">=</span> <span class="st">"earthengine-api==0.1.370"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; * Installing Miniconda -- please wait a moment ...</span></span>
 <span><span class="co">#&gt; * Downloading "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe" ...</span></span>
-<span><span class="co">#&gt; + "C:\Users\runneradmin\AppData\Local\Temp\RtmpWyxwNg\Miniconda3-latest-Windows-x86_64.exe" /InstallationType=JustMe /AddToPath=0 /RegisterPython=0 /NoRegistry=1 /S /D=C:\Users\runneradmin\AppData\Local\r-miniconda</span></span>
+<span><span class="co">#&gt; + "C:\Users\runneradmin\AppData\Local\Temp\RtmpAj7Hnv\Miniconda3-latest-Windows-x86_64.exe" /InstallationType=JustMe /AddToPath=0 /RegisterPython=0 /NoRegistry=1 /S /D=C:\Users\runneradmin\AppData\Local\r-miniconda</span></span>
 <span><span class="co">#&gt; + "C:/Users/runneradmin/AppData/Local/r-miniconda/condabin/conda.bat" update --yes --name base conda</span></span>
 <span><span class="co">#&gt; + "C:/Users/runneradmin/AppData/Local/r-miniconda/condabin/conda.bat" create --yes --name r-reticulate "python=3.10" numpy --quiet -c conda-forge</span></span>
 <span><span class="co">#&gt; * Miniconda has been successfully installed at "C:/Users/runneradmin/AppData/Local/r-miniconda".</span></span>
@@ -182,16 +182,16 @@ Rustler</h4>
 <span><span class="fu">rgee</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/rgee/reference/ee_Initialize.html" class="external-link">ee_Initialize</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
-<span><span class="va">lakes_01_centroid</span> <span class="op">&lt;-</span> <span class="fu">kwb.satellite</span><span class="fu">::</span><span class="fu"><a href="../reference/gee_get_data_for_years.html">gee_get_data_for_years</a></span><span class="op">(</span></span>
+<span><span class="va">lakes_01_ptonsurface</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gee_get_data_for_years.html">gee_get_data_for_years</a></span><span class="op">(</span></span>
 <span>  years <span class="op">=</span> <span class="fl">2018</span>,</span>
 <span>  lakes <span class="op">=</span> <span class="va">lakes_berlin</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span>,</span>
 <span>  <span class="co">#bands = NULL,</span></span>
-<span>  centroid <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  point_on_surface <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="va">lakes_01_centroid</span><span class="op">$</span><span class="va">centroid_mean_2018</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">satellite_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="va">lakes_01_ptonsurface</span><span class="op">$</span><span class="va">satellite_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html" class="external-link">bind_cols</a></span><span class="op">(</span></span>
-<span>    <span class="va">lakes_01_centroid</span><span class="op">$</span><span class="va">centroid_mean_2018</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">satellite_metadata</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="va">lakes_01_ptonsurface</span><span class="op">$</span><span class="va">satellite_metadata</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span></span>
@@ -219,24 +219,24 @@ Rustler</h4>
 <span></span>
 <span><span class="va">years</span> <span class="op">&lt;-</span> <span class="fl">2017</span><span class="op">:</span><span class="fl">2024</span></span>
 <span><span class="va">exp_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">kwb.utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kwb.utils/man/hsOpenWindowsExplorer.html" class="external-link">hsOpenWindowsExplorer</a></span><span class="op">(</span><span class="va">exp_dir</span><span class="op">)</span></span>
+<span><span class="co">#kwb.utils::hsOpenWindowsExplorer(exp_dir)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
 <span><span class="va">lakes_malte_centroid</span> <span class="op">&lt;-</span> <span class="fu">kwb.satellite</span><span class="fu">::</span><span class="fu"><a href="../reference/gee_get_data_for_years.html">gee_get_data_for_years</a></span><span class="op">(</span></span>
 <span>  years <span class="op">=</span> <span class="va">years</span>,</span>
 <span>  lakes <span class="op">=</span> <span class="va">lakes_malte</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span>,</span>
-<span>  centroid <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  point_on_surface <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  col_lakename <span class="op">=</span> <span class="st">"SEE_NAME"</span>,</span>
 <span>  debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">lakes_malte_centroid</span>, <span class="st">"lakes_malte_centroid.rds"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">lakes_malte_points</span>, <span class="st">"lakes_malte_points.rds"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
-<span><span class="va">lakes_malte_centroid_parallel</span> <span class="op">&lt;-</span> <span class="fu">kwb.satellite</span><span class="fu">::</span><span class="fu"><a href="../reference/gee_get_data_for_years_parallel.html">gee_get_data_for_years_parallel</a></span><span class="op">(</span></span>
+<span><span class="va">lakes_malte_point_on_surface_parallel</span> <span class="op">&lt;-</span> <span class="fu">kwb.satellite</span><span class="fu">::</span><span class="fu"><a href="../reference/gee_get_data_for_years_parallel.html">gee_get_data_for_years_parallel</a></span><span class="op">(</span></span>
 <span>  years <span class="op">=</span> <span class="va">years</span>,</span>
 <span>  lakes <span class="op">=</span> <span class="va">lakes_malte</span>,</span>
-<span>  centroid <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  point_on_surface <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  spatial_fun <span class="op">=</span> <span class="st">"mean"</span>,</span>
 <span>  col_lakename <span class="op">=</span> <span class="st">"SEE_NAME"</span>,</span>
 <span>  debug_dir <span class="op">=</span> <span class="va">exp_dir</span>, </span>
@@ -244,8 +244,8 @@ Rustler</h4>
 <span>  debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">lakes_malte_centroid_parallel</span>,</span>
-<span>        <span class="fu">fs</span><span class="fu">::</span><span class="fu"><a href="https://fs.r-lib.org/reference/path_math.html" class="external-link">path_join</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">exp_dir</span>, <span class="st">"lakes_malte_centroid_parallel.rds"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">lakes_malte_point_on_surface_parallel</span>,</span>
+<span>        <span class="fu">fs</span><span class="fu">::</span><span class="fu"><a href="https://fs.r-lib.org/reference/path_math.html" class="external-link">path_join</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">exp_dir</span>, <span class="st">"lakes_malte_points_parallel.rds"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">lakes_selected</span> <span class="op">&lt;-</span> <span class="va">lakes_bb</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
@@ -253,11 +253,10 @@ Rustler</h4>
 <span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
-<span><span class="va">lakes_bb_centroid</span> <span class="op">&lt;-</span> <span class="fu">kwb.satellite</span><span class="fu">::</span><span class="fu"><a href="../reference/gee_get_data_for_years_parallel.html">gee_get_data_for_years_parallel</a></span><span class="op">(</span></span>
+<span><span class="va">lakes_bb_point_on_surface</span> <span class="op">&lt;-</span> <span class="fu">kwb.satellite</span><span class="fu">::</span><span class="fu"><a href="../reference/gee_get_data_for_years_parallel.html">gee_get_data_for_years_parallel</a></span><span class="op">(</span></span>
 <span>  years <span class="op">=</span> <span class="va">years</span>,</span>
 <span>  lakes <span class="op">=</span> <span class="va">lakes_selected</span>,</span>
-<span>  centroid <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  col_lakename <span class="op">=</span> <span class="st">"SEE_NAME"</span>,</span>
+<span>  point_on_surface <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  spatial_fun <span class="op">=</span> <span class="st">"mean"</span>,</span>
 <span>  col_lakename <span class="op">=</span> <span class="st">"SEE_NAME"</span>,</span>
 <span>  debug_dir <span class="op">=</span> <span class="va">exp_dir</span>, </span>
@@ -265,13 +264,13 @@ Rustler</h4>
 <span>  debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">lakes_bb_centroid</span>, <span class="st">"lakes_bb_centroid.rds"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">lakes_bb_point_on_surface</span>, <span class="st">"lakes_bb_point_on_surface.rds"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
 <span><span class="va">lakes_polygon</span> <span class="op">&lt;-</span> <span class="fu">kwb.satellite</span><span class="fu">::</span><span class="fu"><a href="../reference/gee_get_data_for_years_parallel.html">gee_get_data_for_years_parallel</a></span><span class="op">(</span></span>
 <span>  years <span class="op">=</span> <span class="va">years</span>,</span>
 <span>  lakes <span class="op">=</span> <span class="va">lakes_selected</span>,</span>
-<span>  centroid <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  point_on_surface <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  spatial_fun <span class="op">=</span> <span class="st">"mean"</span>,</span>
 <span>  col_lakename <span class="op">=</span> <span class="st">"SEE_NAME"</span>,</span>
 <span>  debug_dir <span class="op">=</span> <span class="va">exp_dir</span>, </span>
@@ -303,7 +302,7 @@ Rustler</h4>
 <span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a> collate  English_United States.utf8</span>
 <span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a> ctype    English_United States.utf8</span>
 <span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a> tz       UTC</span>
-<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a> date     <span class="dv">2024-05-13</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a> date     <span class="dv">2024-05-14</span></span>
 <span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a> pandoc   <span class="dv">3</span>.<span class="fl">1.11</span> <span class="sc">@</span> C<span class="sc">:</span><span class="er">/</span>HOSTED<span class="sc">~</span><span class="dv">1</span><span class="sc">/</span>windows<span class="sc">/</span>pandoc<span class="sc">/</span><span class="dv">31</span>F387<span class="sc">~</span><span class="fl">1.11</span><span class="sc">/</span>x64<span class="sc">/</span>PANDOC<span class="sc">~</span><span class="fl">1.11</span><span class="sc">/</span> (via rmarkdown)</span>
 <span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a></span>
 <span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a> [<span class="dv">1</span>m [<span class="dv">36</span>m─ Packages ─────────────────────────────────────────────────────────────────── [<span class="dv">39</span>m [<span class="dv">22</span>m</span>
@@ -414,7 +413,7 @@ Rustler</h4>
 <span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>  <span class="sc">-</span> libiconv<span class="ot">=</span><span class="fl">1.17</span><span class="ot">=</span>hcfcfb64_2</span>
 <span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>  <span class="sc">-</span> liblapack<span class="ot">=</span><span class="dv">3</span>.<span class="fl">9.0</span><span class="ot">=</span><span class="dv">22</span>_win64_mkl</span>
 <span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>  <span class="sc">-</span> libsqlite<span class="ot">=</span><span class="dv">3</span>.<span class="fl">45.3</span><span class="ot">=</span>hcfcfb64_0</span>
-<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>  <span class="sc">-</span> libxml2<span class="ot">=</span><span class="dv">2</span>.<span class="fl">12.6</span><span class="ot">=</span>hc3477c8_2</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>  <span class="sc">-</span> libxml2<span class="ot">=</span><span class="dv">2</span>.<span class="fl">12.7</span><span class="ot">=</span>h283a6d9_0</span>
 <span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>  <span class="sc">-</span> libzlib<span class="ot">=</span><span class="dv">1</span>.<span class="fl">2.13</span><span class="ot">=</span>hcfcfb64_5</span>
 <span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a>  <span class="sc">-</span> mkl<span class="ot">=</span><span class="dv">2024</span>.<span class="fl">1.0</span><span class="ot">=</span>h66d3029_692</span>
 <span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a>  <span class="sc">-</span> numpy<span class="ot">=</span><span class="dv">1</span>.<span class="fl">26.4</span><span class="ot">=</span>py312h8753938_0</span>
