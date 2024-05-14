@@ -60,7 +60,7 @@ gee_get_data_for_years_parallel <- function(
   geos <- tolower(sf::st_geometry_type(lakes_malte))
 
   shape_type <- if(all(geos == "point")) {
-
+    "point"
   } else if (all(geos == "polygon") & point_on_surface == FALSE) {
     "polygon"
   } else if (all(geos == "polygon") & point_on_surface == TRUE) {
