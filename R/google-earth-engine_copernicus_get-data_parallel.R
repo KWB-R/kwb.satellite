@@ -57,7 +57,17 @@ gee_get_data_for_years_parallel <- function(
     n_year_splits = 2) {
 
 
-  shape_type <- if(point_on_surface) { "point_on_surface"} else { "polygon"}
+  geos <- tolower(sf::st_geometry_type(lakes_malte))
+
+  shape_type <- if(all(geos == "point")) {
+
+  } else if (all(geos == "polygon") & point_on_surface == FALSE) {
+    "polygon"
+  } else if (all(geos == "polygon") & point_on_surface == TRUE) {
+    "point_on_surface"
+  } else {
+    "unclear"
+  }
 
   # create_ad4gd_env(debug = debug)
   # reticulate::use_condaenv("ad4gd")

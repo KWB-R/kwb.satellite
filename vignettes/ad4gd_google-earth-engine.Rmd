@@ -136,10 +136,10 @@ lakes_malte_centroid <- kwb.satellite::gee_get_data_for_years(
 saveRDS(lakes_malte_points, "lakes_malte_points.rds")
 
 system.time(
-lakes_malte_point_on_surface_parallel <- kwb.satellite::gee_get_data_for_years_parallel(
+lakes_malte_points_parallel <- kwb.satellite::gee_get_data_for_years_parallel(
   years = years,
   lakes = lakes_malte,
-  point_on_surface = TRUE,
+  point_on_surface = FALSE,
   spatial_fun = "mean",
   col_lakename = "SEE_NAME",
   debug_dir = exp_dir, 
