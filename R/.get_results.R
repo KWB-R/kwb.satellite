@@ -21,34 +21,9 @@ View(dat_meta)
 
 
 
-convert_to_list <- function(coords) {
+sat_data_list <- kwb.satellite::import_rds(rds_dir = "C:/Users/mrustl/AppData/Local/Temp/RtmpM7DGhL")
 
-tmp_mat <- lapply(seq_along(coords),
-                            FUN = function(idx) {
-
-  t(as.matrix(coords[[idx]]))
-})
-
-list(do.call(rbind, tmp_mat))
-}
-
-sat_data_list <- kwb.satellite::import_rds(rds_dir = "C:/Users/mrustl/AppData/Local/Temp/Rtmpkv5MPc")
-sat_data <- dplyr::bind_rows(sat_data_list)
-View(sat_data)
-
-sat_meta_unnest <- tidyr::unnest(sat_data,
-                             c("satellite_data", "satellite_metadata"),
-                             names_sep = ".")
-
-
-coords <- lapply(seq_len(nrow(sat_meta_unnest)), function(idx) {
-convert_to_list(sat_meta_unnest$satellite_metadata.geometry[[idx]]$`system:footprint`$coordinates) %>%
-  sf::st_polygon() %>%
-  sf::st_sfc() %>%
-  sf::st_set_crs(value = 4326)
-})
-
-sat_meta_unnest$satellite_metadata.geometry_coords <- coords
+sat_meta_unnest <- flatten_results(sat_data_list)
 
 archive::archive_extract("https://data.geobasis-bb.de/geofachdaten/Wasser/Hydrologie/seen25.zip",
                          dir = "lakes_bb")
