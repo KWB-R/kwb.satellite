@@ -32,11 +32,6 @@ tmp_mat <- lapply(seq_along(coords),
 list(do.call(rbind, tmp_mat))
 }
 
-tmp <- dat[1, ]$satellite_metadata[[1]][[84]][[1]]
-
-coords_list <- convert_to_list(tmp$`system:footprint`$coordinates)
-sat_meta <- sf::st_polygon(coords_list)
-
 sat_data_list <- kwb.satellite::import_rds(rds_dir = "C:/Users/mrustl/AppData/Local/Temp/Rtmpkv5MPc")
 sat_data <- dplyr::bind_rows(sat_data_list)
 View(sat_data)
@@ -48,10 +43,12 @@ sat_meta_unnest <- tidyr::unnest(sat_data,
 
 coords <- lapply(seq_len(nrow(sat_meta_unnest)), function(idx) {
 convert_to_list(sat_meta_unnest$satellite_metadata.geometry[[idx]]$`system:footprint`$coordinates) %>%
-  sf::st_polygon()
+  sf::st_polygon() %>%
+  sf::st_sfc() %>%
+  sf::st_set_crs(value = 4326)
 })
 
-sat_meta_unnest$coords <- coords
+sat_meta_unnest$satellite_metadata.geometry_coords <- coords
 
 archive::archive_extract("https://data.geobasis-bb.de/geofachdaten/Wasser/Hydrologie/seen25.zip",
                          dir = "lakes_bb")
@@ -64,6 +61,9 @@ sat_meta_unnest <- dplyr::left_join(sat_meta_unnest,
                    as.data.frame(),
                  by = "SEE_KZ")
 
+sat_meta_unnest$geometry_bb_point_on_surface <- sf::st_point_on_surface(sat_meta_unnest$geometry_bb) %>%
+  sf::st_transform(4326)
+
 sat_meta_unnest$geometry_bb <- sf::st_transform(sat_meta_unnest$geometry_bb,
                                                 crs = 4326)
 
@@ -71,21 +71,19 @@ sat_meta_unnest$geometry_bb_centroid <- sf::st_centroid(sat_meta_unnest$geometry
 
 seq_images <- seq_along(sat_meta_unnest$satellite_metadata.geometry)
 
-# sat_multi_coors <- lapply(seq_images, function(i) {
-#   convert_to_list(
-#   sat_data_unnest2_meta$satellite_metadata.geometry[[i]]$`system:footprint`$coordinates
-#   ) %>% sf::st_polygon()
-#   })
-#
-# View(sat_multi_coors)
-
-
 see_name <- unique(sat_meta_unnest$SEE_NAME)[order(unique(sat_meta_unnest$SEE_NAME))]
+
+csv_path <- system.file("extdata/lakes_bb_malte.csv", package = "kwb.satellite")
+
+lakes_malte <- readr::read_csv(csv_path) %>%
+  sf::st_as_sf(coords = c("long", "lat"),  crs = 4326)
 
 # for(i in seq_images) {
 for(see in see_name) {
 dat <- sat_meta_unnest[sat_meta_unnest$SEE_NAME == see,] %>%
   dplyr::first()
+
+see_malte <- lakes_malte$geometry[lakes_malte$SEE_NAME == see]
 
 i <- 1
 
@@ -94,24 +92,39 @@ leaflet::leaflet() %>%
   leaflet::addTiles() %>%
   leaflet::addProviderTiles(leaflet::providers$CartoDB.Positron) %>%
   leaflet::addPolygons(
-    color = "red",
-    data = dat$coords[[i]]
-  ) %>%
-  leaflet::addCircles(color = "blue",
-                       data = dat$geometry[[i]]) %>%
-    leaflet::addCircles(color = "lightblue",
-                        data = dat$geometry_bb_centroid[[i]]) %>%
-  leaflet::addPolygons(color = "green",
+    color = "yellow",
+    opacity = 0.1,
+    fillOpacity = 0.1,
+    data = dat$satellite_metadata.geometry_coords[[i]]
+    ) %>%
+  leaflet::addPolygons(color = "blue",
+                       opacity = 0.1,
+                       fillOpacity = 0.1,
                        data = dat$geometry_bb[[i]]) %>%
+  leaflet::addCircles(color = "red",
+                      data = dat$geometry[[i]]) %>%
+  leaflet::addCircles(color = "black",
+                      data = dat$geometry_bb_point_on_surface[[i]]) %>%
+  leaflet::setView(lng = dat$geometry_bb_point_on_surface[[i]][1],
+                   lat = dat$geometry_bb_point_on_surface[[i]][2],
+                   zoom = 12) %>%
+  leaflet::addLegend(position = "topright",
+                     title = see,
+                     colors = c("#000000", "#ff0000"),
+                     labels = c("point_on_surface", "malte")
+                     ) %>%
+  # leaflet::addCircles(color = "orange",
+  #                      data = see_malte) %>%
   print()
   kwb.base::hsWait(0.5)
 }
 
 
+
 meta <- get_results(sat_list = lakes_01_centroid, data_type = "metadata")
 
 
-lakes_bb[lakes_bb$SEE_NAME == "Plötzensee",] %>%
+lakes_bb[lakes_bb$SEE_NAME == "Plötzensee", ] %>%
   sf::st_transform(4326) %>%
   leaflet::leaflet() %>%
   leaflet::addTiles() %>%

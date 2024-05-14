@@ -9,7 +9,7 @@ gee_get_data_for_years(
   lakes,
   image_collection = "COPERNICUS/S2_SR_HARMONIZED",
   bands = as.list(c("QA60", paste0("B", 1:6))),
-  centroid = FALSE,
+  point_on_surface = FALSE,
   spatial_fun = "mean",
   scale = 10,
   via = "getInfo",
@@ -28,7 +28,7 @@ gee_get_data_for_years(
 
 \item{bands}{bands}
 
-\item{centroid}{use centroid or polygon? (default: FALSE)}
+\item{point_on_surface}{use sf::st_point_on_surface or polygon? (default: FALSE)}
 
 \item{spatial_fun}{spatial aggregation function (default: "mean")}
 

@@ -7,7 +7,7 @@
 gee_get_data(
   collection,
   lakes,
-  centroid = FALSE,
+  point_on_surface = FALSE,
   spatial_fun = "mean",
   scale = 10,
   via = "getInfo",
@@ -20,7 +20,7 @@ gee_get_data(
 
 \item{lakes}{lakes sf data frame witch shapes of lakes}
 
-\item{centroid}{use centroid or polygon? (default: FALSE)}
+\item{point_on_surface}{use sf::st_point_on_surface() or polygon? (default: FALSE)}
 
 \item{spatial_fun}{spatial aggregation function (default: "mean")}
 

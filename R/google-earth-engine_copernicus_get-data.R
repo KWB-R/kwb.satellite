@@ -4,7 +4,7 @@
 #' @param lakes lakes sf data frame witch shapes of lakes
 #' @param image_collection image collection (default: "COPERNICUS/S2_SR_HARMONIZED")
 #' @param bands bands
-#' @param centroid use centroid or polygon? (default: FALSE)
+#' @param point_on_surface use sf::st_point_on_surface or polygon? (default: FALSE)
 #' @param spatial_fun spatial aggregation function (default: "mean")
 #' @param scale scale parameter (default: 10), for details, see
 #' \url{https://developers.google.com/earth-engine/guides/scale}
@@ -27,7 +27,7 @@ gee_get_data_for_years <- function(years = 2018,
                                    lakes,
                                    image_collection = "COPERNICUS/S2_SR_HARMONIZED",
                                    bands = as.list(c("QA60", paste0("B", 1:6))),
-                                   centroid = FALSE,
+                                   point_on_surface = FALSE,
                                    spatial_fun = "mean",
                                    scale = 10,
                                    via = "getInfo",
@@ -44,8 +44,6 @@ gee_get_data_for_years <- function(years = 2018,
     message(sprintf("Converting object 'lakes' = '%s'", lakes_obj))
     lakes <- sf::st_as_sf(lakes)
   }
-
-  shape_type <- if(centroid) { "centroid"} else { "polygon"}
 
   lakes <- sf::st_transform(lakes, crs = 4326)
 
@@ -95,17 +93,15 @@ gee_get_data_for_years <- function(years = 2018,
                            stopifnot(n_images * n_bands <= 5000)
                            gee_get_data(collection = collection,
                                         lakes = lakes,
-                                        centroid = centroid,
+                                        point_on_surface = point_on_surface,
                                         spatial_fun = spatial_fun,
                                         scale = scale,
                                         via = via,
                                         col_lakename = col_lakename) %>%
                              dplyr::bind_cols(tibble::tibble(
+                               year = year,
                                date_start = dates$start[idx],
-                               date_end = dates$end[idx]),
-                               shape_type = shape_type,
-                               spatial_fun = spatial_fun,
-                               year = year)
+                               date_end = dates$end[idx]))
                          },
                          dbg = debug,
                          newLine = 1L)
@@ -121,7 +117,7 @@ gee_get_data_for_years <- function(years = 2018,
 #'
 #' @param collection collection satellite collection
 #' @param lakes lakes sf data frame witch shapes of lakes
-#' @param centroid use centroid or polygon? (default: FALSE)
+#' @param point_on_surface use sf::st_point_on_surface() or polygon? (default: FALSE)
 #' @param spatial_fun spatial aggregation function (default: "mean")
 #' @param scale scale parameter (default: 10), for details, see
 #' \url{https://developers.google.com/earth-engine/guides/scale}
@@ -135,7 +131,7 @@ gee_get_data_for_years <- function(years = 2018,
 #'
 #' @importFrom kwb.utils catAndRun
 #' @importFrom rgee sf_as_ee
-#' @importFrom sf st_centroid st_bbox st_point
+#' @importFrom sf st_point_on_surface st_bbox st_point
 #' @importFrom tibble as_tibble
 #' @importFrom dplyr arrange select mutate bind_cols
 #' @importFrom tidyselect all_of
@@ -143,7 +139,7 @@ gee_get_data_for_years <- function(years = 2018,
 #' @importFrom tidyr pivot_longer separate nest
 gee_get_data <- function (collection,
                           lakes,
-                          centroid = FALSE,
+                          point_on_surface = FALSE,
                           spatial_fun = "mean",
                           scale = 10,
                           via = "getInfo",
@@ -160,7 +156,10 @@ gee_get_data <- function (collection,
   }
 
   lapply(seq_len(nrow(lakes)), function(idx) {
+
     lake <- lakes[idx, ]
+
+    shape_type <- tolower(sf::st_geometry_type(lake))
 
     res <- kwb.utils::catAndRun(
       messageText = sprintf(
@@ -170,13 +169,24 @@ gee_get_data <- function (collection,
         nrow(lakes)
       ),
       expr = {
-        lake_gee <- if (centroid) {
-          print("centroid")
-          x <- sf::st_centroid(lake)
-          x <- sf::st_bbox(x)[1:2]
-          rgee::sf_as_ee(sf::st_point(x))
+        lake_gee <- if (point_on_surface & shape_type != "point") {
+          kwb.utils::catAndRun(
+            messageText = sprintf("convert '%s' to point with 'sf::st_point_on_surface()'",
+                                  shape_type),
+            expr = {
+              shape_type <- sprintf("%s_to_point_on_surface", shape_type)
+              x <- lake %>%
+                sf::st_transform(25833) %>%
+                sf::st_point_on_surface() %>%
+                sf::st_transform(4326)
+
+              x <- sf::st_bbox(x)[1:2]
+              rgee::sf_as_ee(sf::st_point(x))
+            },
+            dbg = debug)
         } else {
-          print("polygon")
+          message(sprintf("using '%s' geometry provided in 'lakes' argument",
+                          shape_type))
           rgee::sf_as_ee(lake)
         }
 
@@ -226,7 +236,9 @@ gee_get_data <- function (collection,
                          tidyr::nest(band_timeseries_wide,
                                      .key = "satellite_data")) %>%
           dplyr::bind_cols(tidyr::nest(metadata,
-                                       .key = "satellite_metadata"))
+                                       .key = "satellite_metadata")) %>%
+          dplyr::bind_cols(tibble::tibble(shape_type = shape_type,
+                                          spatial_fun = spatial_fun))
       },
       dbg = debug,
       newLine = 1L

@@ -84,16 +84,16 @@ library(rgee)
 rgee::ee_Initialize()
 
 system.time(
-lakes_01_centroid <- kwb.satellite::gee_get_data_for_years(
+lakes_01_ptonsurface <- gee_get_data_for_years(
   years = 2018,
   lakes = lakes_berlin[1, ],
   #bands = NULL,
-  centroid = TRUE)
+  point_on_surface = TRUE)
 )
 
-dat <- lakes_01_centroid$centroid_mean_2018$data$satellite_data[[1]] %>% 
+dat <- lakes_01_ptonsurface$satellite_data[[1]] %>% 
   dplyr::bind_cols(
-    lakes_01_centroid$centroid_mean_2018$data$satellite_metadata[[1]]
+    lakes_01_ptonsurface$satellite_metadata[[1]]
   )
 
 
@@ -122,24 +122,24 @@ lakes_malte <- readr::read_csv(csv_path) %>%
 
 years <- 2017:2024
 exp_dir <- tempdir()
-kwb.utils::hsOpenWindowsExplorer(exp_dir)
+#kwb.utils::hsOpenWindowsExplorer(exp_dir)
 
 system.time(
 lakes_malte_centroid <- kwb.satellite::gee_get_data_for_years(
   years = years,
   lakes = lakes_malte[2,],
-  centroid = TRUE,
+  point_on_surface = FALSE,
   col_lakename = "SEE_NAME",
   debug = TRUE)
 )
 
-saveRDS(lakes_malte_centroid, "lakes_malte_centroid.rds")
+saveRDS(lakes_malte_points, "lakes_malte_points.rds")
 
 system.time(
-lakes_malte_centroid_parallel <- kwb.satellite::gee_get_data_for_years_parallel(
+lakes_malte_point_on_surface_parallel <- kwb.satellite::gee_get_data_for_years_parallel(
   years = years,
   lakes = lakes_malte,
-  centroid = TRUE,
+  point_on_surface = TRUE,
   spatial_fun = "mean",
   col_lakename = "SEE_NAME",
   debug_dir = exp_dir, 
@@ -147,8 +147,8 @@ lakes_malte_centroid_parallel <- kwb.satellite::gee_get_data_for_years_parallel(
   debug = TRUE)
 )
 
-saveRDS(lakes_malte_centroid_parallel,
-        fs::path_join(c(exp_dir, "lakes_malte_centroid_parallel.rds"))
+saveRDS(lakes_malte_point_on_surface_parallel,
+        fs::path_join(c(exp_dir, "lakes_malte_points_parallel.rds"))
 )
 
 lakes_selected <- lakes_bb %>% 
@@ -156,11 +156,10 @@ lakes_selected <- lakes_bb %>%
 
 
 system.time(
-lakes_bb_centroid <- kwb.satellite::gee_get_data_for_years_parallel(
+lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
   years = years,
   lakes = lakes_selected,
-  centroid = TRUE,
-  col_lakename = "SEE_NAME",
+  point_on_surface = TRUE,
   spatial_fun = "mean",
   col_lakename = "SEE_NAME",
   debug_dir = exp_dir, 
@@ -168,13 +167,13 @@ lakes_bb_centroid <- kwb.satellite::gee_get_data_for_years_parallel(
   debug = TRUE)
 )
 
-saveRDS(lakes_bb_centroid, "lakes_bb_centroid.rds")
+saveRDS(lakes_bb_point_on_surface, "lakes_bb_point_on_surface.rds")
 
 system.time(
 lakes_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
   years = years,
   lakes = lakes_selected,
-  centroid = FALSE,
+  point_on_surface = FALSE,
   spatial_fun = "mean",
   col_lakename = "SEE_NAME",
   debug_dir = exp_dir, 

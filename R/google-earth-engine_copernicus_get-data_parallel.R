@@ -4,7 +4,7 @@
 #' @param lakes lakes sf data frame witch shapes of lakes
 #' @param image_collection image collection (default: "COPERNICUS/S2_SR_HARMONIZED")
 #' @param bands bands
-#' @param centroid use centroid or polygon? (default: FALSE)
+#' @param point_on_surface use sf::st_point_on_surface or polygon? (default: FALSE)
 #' @param spatial_fun spatial aggregation function (default: "mean")
 #' @param scale scale parameter (default: 10), for details, see
 #' \url{https://developers.google.com/earth-engine/guides/scale}
@@ -42,7 +42,7 @@ gee_get_data_for_years_parallel <- function(
     lakes,
     image_collection = "COPERNICUS/S2_SR_HARMONIZED",
     bands = as.list(c("QA60", paste0("B", 1:6))),
-    centroid = FALSE,
+    point_on_surface = FALSE,
     spatial_fun = "mean",
     scale = 10,
     via = "getInfo",
@@ -57,7 +57,7 @@ gee_get_data_for_years_parallel <- function(
     n_year_splits = 2) {
 
 
-  shape_type <- if(centroid) { "centroid"} else { "polygon"}
+  shape_type <- if(point_on_surface) { "point_on_surface"} else { "polygon"}
 
   # create_ad4gd_env(debug = debug)
   # reticulate::use_condaenv("ad4gd")
@@ -88,7 +88,7 @@ gee_get_data_for_years_parallel <- function(
       lakes = lakes[idx,],
       image_collection = image_collection,
       bands = bands,
-      centroid = centroid,
+      point_on_surface = point_on_surface,
       spatial_fun = spatial_fun,
       scale = scale,
       via = via,

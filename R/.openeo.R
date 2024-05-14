@@ -33,8 +33,8 @@ bands <- as.list(c("CLD", sprintf("B%02d", 1:6)))
 
 data <- p$load_collection(id = colls$SENTINEL2_L2A$id,
                           spatial_extent = lakes,
-                          temporal_extent = list("2020-04-01",
-                                                 "2020-05-01"))
+                          temporal_extent = list("2017-01-01",
+                                                 Sys.Date()))
 
 
 temporal_reduce = p$reduce_dimension(data = data,
@@ -54,7 +54,7 @@ apply_linear_transform = p$apply(data=temporal_reduce,process = function(value,.
 result <- p$save_result(data = data,
                         format = formats$output$netCDF)
 
-job_definition <- openeo::create_job(result, title = "Baalsee_raw_all-bands_netCDF")
+job_definition <- openeo::create_job(result, title = "Baalsee_raw_all-bands_2017-2024_netCDF")
 
 as(object = job_definition, "Process")
 
@@ -68,8 +68,11 @@ netcdf_path <- openeo::download_results(job = job_definition$id,
 
 dat <- ncdf4::nc_open(netcdf_path[[1]])
 
-dat$dim$t
+dat$dim$t$vals + as.Date("1990-01-01")
+
 
 View(dat)
 
 b01_mat <- ncdf4::ncvar_get(dat, varid = "B01")
+
+b01_mat[,,1]
