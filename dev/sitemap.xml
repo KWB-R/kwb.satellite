@@ -28,6 +28,9 @@
     <loc>/dev/news/index.html</loc>
   </url>
   <url>
+    <loc>/dev/reference/convert_to_list.html</loc>
+  </url>
+  <url>
     <loc>/dev/reference/copernicus_cds.html</loc>
   </url>
   <url>
@@ -35,6 +38,9 @@
   </url>
   <url>
     <loc>/dev/reference/create_ad4gd_env.html</loc>
+  </url>
+  <url>
+    <loc>/dev/reference/flatten_results.html</loc>
   </url>
   <url>
     <loc>/dev/reference/gee_get_data.html</loc>
