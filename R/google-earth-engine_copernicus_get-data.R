@@ -131,7 +131,7 @@ gee_get_data_for_years <- function(years = 2018,
 #'
 #' @importFrom kwb.utils catAndRun
 #' @importFrom rgee sf_as_ee
-#' @importFrom sf st_point_on_surface st_bbox st_point
+#' @importFrom sf st_point_on_surface st_bbox st_point st_geometry
 #' @importFrom tibble as_tibble
 #' @importFrom dplyr arrange select mutate bind_cols
 #' @importFrom tidyselect all_of
@@ -187,7 +187,10 @@ gee_get_data <- function (collection,
         } else {
           message(sprintf("using '%s' geometry provided in 'lakes' argument",
                           shape_type))
-          rgee::sf_as_ee(lake)
+
+          lake %>%
+            sf::st_geometry() %>%
+            rgee::sf_as_ee()
         }
 
         collection_lake <- collection$filterBounds(lake_gee)
