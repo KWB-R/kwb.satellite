@@ -9,7 +9,7 @@ gee_get_data_for_years_parallel(
   years = 2018,
   lakes,
   image_collection = "COPERNICUS/S2_SR_HARMONIZED",
-  bands = as.list(c("QA60", paste0("B", 1:6))),
+  bands = NULL,
   point_on_surface = FALSE,
   spatial_fun = "mean",
   scale = 10,
@@ -22,7 +22,7 @@ gee_get_data_for_years_parallel(
   export_rds = TRUE,
   export_dir = tempdir(),
   ncores = parallel::detectCores() - 1,
-  n_year_splits = 2
+  n_year_splits = 3
 )
 }
 \arguments{
@@ -32,7 +32,8 @@ gee_get_data_for_years_parallel(
 
 \item{image_collection}{image collection (default: "COPERNICUS/S2_SR_HARMONIZED")}
 
-\item{bands}{bands}
+\item{bands}{bands (defualt: NULL), for selection provide in the following
+format: as.list(c("QA60", paste0("B", 1:6)))}
 
 \item{point_on_surface}{use sf::st_point_on_surface or polygon? (default: FALSE)}
 

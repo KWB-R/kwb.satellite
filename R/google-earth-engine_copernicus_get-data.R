@@ -3,7 +3,8 @@
 #' @param years years vector of years for which satellite data should be downloaded
 #' @param lakes lakes sf data frame witch shapes of lakes
 #' @param image_collection image collection (default: "COPERNICUS/S2_SR_HARMONIZED")
-#' @param bands bands
+#' @param bands bands (defualt: NULL), for selection provide in the following
+#' format: as.list(c("QA60", paste0("B", 1:6)))
 #' @param point_on_surface use sf::st_point_on_surface or polygon? (default: FALSE)
 #' @param spatial_fun spatial aggregation function (default: "mean")
 #' @param scale scale parameter (default: 10), for details, see
@@ -15,7 +16,7 @@
 #' @param debug print debug messages? (default: TRUE)
 #' @param ee_print show debug messages for "ee" (default: FALSE)
 #' @param n_year_splits  number of year splits per request. Required in case request
-#' uses too much images > 400-500 per year (default: 2)
+#' uses too much images > 400-500 per year (default: 3)
 #' @return list with data and metadata, each of them tibbles
 #' @export
 #' @importFrom rgee ee sf_as_ee ee_print
@@ -26,7 +27,7 @@
 gee_get_data_for_years <- function(years = 2018,
                                    lakes,
                                    image_collection = "COPERNICUS/S2_SR_HARMONIZED",
-                                   bands = as.list(c("QA60", paste0("B", 1:6))),
+                                   bands = NULL, #as.list(c("QA60", paste0("B", 1:6))),
                                    point_on_surface = FALSE,
                                    spatial_fun = "mean",
                                    scale = 10,
@@ -34,7 +35,7 @@ gee_get_data_for_years <- function(years = 2018,
                                    col_lakename = "GEWNAME",
                                    debug = TRUE,
                                    ee_print = FALSE,
-                                   n_year_splits = 2) {
+                                   n_year_splits = 3) {
 
   stopifnot(spatial_fun %in% names(rgee::ee$Reducer))
 

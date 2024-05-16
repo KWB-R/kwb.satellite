@@ -47,10 +47,10 @@ kwb.satellite::import_rds(dir) %>%
 }
 
 
-tmp <- import_and_flatten("vignettes/gee/lakes_bb_selected_polygon/")
-tmp_flatten <- lapply(seq_along(length(tmp)), function(i) try(flatten_results[[i]]))
+tmp <- kwb.satellite::import_rds("vignettes/gee/lakes_bb_selected_polygon/")
+tmp_flatten <- lapply(seq_along(tmp), function(i) try(kwb.satellite::flatten_results(tmp[[i]])))
 is_try_error <- lapply(seq_along(tmp_flatten), function (i) inherits(tmp_flatten[[i]],'try-error'))
-tmp_flatten_error <- tmp[which(unlist(is_try_error))]
+tmp_flatten_error <- tmp[!which(unlist(is_try_error))]
 
 
 lapply(1:nrow(tmp_flatten_error$`Senftenberger See_point_mean_2017-2024`),
@@ -87,12 +87,22 @@ archive::archive_extract("https://data.geobasis-bb.de/geofachdaten/Wasser/Hydrol
                          dir = "lakes_bb")
 lakes_bb <- sf::read_sf("lakes_bb/Seen25_20211105/seen25.shp")
 
+
 sat_meta_unnest <- dplyr::left_join(sat_meta_unnest,
                  lakes_bb[,c("SEE_KZ", "geometry")] %>%
                    dplyr::rename(geometry_bb = geometry) %>%
                    dplyr::mutate(SEE_KZ = as.double(SEE_KZ)) %>%
                    as.data.frame(),
                  by = "SEE_KZ")
+
+
+tmp_flatten_cor <- tmp_flatten[!(unlist(is_try_error))]
+
+
+for (i in 1:30) {
+sat_meta_unnest <- tmp_flatten_cor[[i]]
+
+sat_meta_unnest$geometry_bb <- sat_meta_unnest$geometry
 
 sat_meta_unnest$geometry_bb_point_on_surface <- sf::st_point_on_surface(sat_meta_unnest$geometry_bb) %>%
   sf::st_transform(4326)
@@ -112,11 +122,11 @@ lakes_malte <- readr::read_csv(csv_path) %>%
   sf::st_as_sf(coords = c("long", "lat"),  crs = 4326)
 
 # for(i in seq_images) {
-for(see in see_name) {
-dat <- sat_meta_unnest[sat_meta_unnest$SEE_NAME == see,] %>%
-  dplyr::first()
+# for(see in see_name) {
+#dat <- sat_meta_unnest[sat_meta_unnest$SEE_NAME == see,] %>%
+dat <- sat_meta_unnest %>% dplyr::first()
 
-see_malte <- lakes_malte$geometry[lakes_malte$SEE_NAME == see]
+see_malte <- lakes_malte$geometry[lakes_malte$SEE_NAME == dat$SEE_NAME]
 
 i <- 1
 
@@ -134,20 +144,20 @@ leaflet::leaflet() %>%
                        opacity = 0.1,
                        fillOpacity = 0.1,
                        data = dat$geometry_bb[[i]]) %>%
-  leaflet::addCircles(color = "red",
-                      data = dat$geometry[[i]]) %>%
   leaflet::addCircles(color = "black",
                       data = dat$geometry_bb_point_on_surface[[i]]) %>%
+  leaflet::addCircles(color = "green",
+                      data = dat$geometry_bb_centroid [[i]]) %>%
+  # leaflet::addCircles(color = "red",
+  #                     data = see_malte) %>%
   leaflet::setView(lng = dat$geometry_bb_point_on_surface[[i]][1],
                    lat = dat$geometry_bb_point_on_surface[[i]][2],
                    zoom = 12) %>%
   leaflet::addLegend(position = "topright",
-                     title = see,
-                     colors = c("#000000", "#ff0000"),
-                     labels = c("point_on_surface", "malte")
+                     title = dat$SEE_NAME,
+                     colors = c("#000000", "#00FF00","#ff0000"),
+                     labels = c("point_on_surface", "centroid", "malte")
                      ) %>%
-  # leaflet::addCircles(color = "orange",
-  #                      data = see_malte) %>%
   print()
   kwb.base::hsWait(0.5)
 }

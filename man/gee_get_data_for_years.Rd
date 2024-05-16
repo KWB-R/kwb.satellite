@@ -8,7 +8,7 @@ gee_get_data_for_years(
   years = 2018,
   lakes,
   image_collection = "COPERNICUS/S2_SR_HARMONIZED",
-  bands = as.list(c("QA60", paste0("B", 1:6))),
+  bands = NULL,
   point_on_surface = FALSE,
   spatial_fun = "mean",
   scale = 10,
@@ -16,7 +16,7 @@ gee_get_data_for_years(
   col_lakename = "GEWNAME",
   debug = TRUE,
   ee_print = FALSE,
-  n_year_splits = 2
+  n_year_splits = 3
 )
 }
 \arguments{
@@ -26,7 +26,8 @@ gee_get_data_for_years(
 
 \item{image_collection}{image collection (default: "COPERNICUS/S2_SR_HARMONIZED")}
 
-\item{bands}{bands}
+\item{bands}{bands (defualt: NULL), for selection provide in the following
+format: as.list(c("QA60", paste0("B", 1:6)))}
 
 \item{point_on_surface}{use sf::st_point_on_surface or polygon? (default: FALSE)}
 
@@ -46,7 +47,7 @@ water bodies)}
 \item{ee_print}{show debug messages for "ee" (default: FALSE)}
 
 \item{n_year_splits}{number of year splits per request. Required in case request
-uses too much images > 400-500 per year (default: 2)}
+uses too much images > 400-500 per year (default: 3)}
 }
 \value{
 list with data and metadata, each of them tibbles
