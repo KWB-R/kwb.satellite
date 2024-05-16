@@ -20,10 +20,31 @@ dat_meta <- dplyr::bind_cols(dat[1,]$satellite_data, dat[1,]$satellite_metadata)
 View(dat_meta)
 
 
+dirs <- fs::dir_ls("test",
+                   type = "directory")
 
-sat_data_list <- kwb.satellite::import_rds(rds_dir = "C:/Users/mrustl/AppData/Local/Temp/RtmpM7DGhL")
+dirs <- dirs[2]
 
-sat_meta_unnest <- flatten_results(sat_data_list)
+lake <- tmp$`Großer Baalsee_point_mean_2017-2024`
+year <- 2020
+
+tmp <- kwb.satellite::import_rds(dirs)
+tmp_flatten <- lapply(seq_along(tmp),
+                      function(i) {
+                        print(i)
+                        kwb.satellite::flatten_results(tmp[[i]])})
+
+
+sat_meta_list <- stats::setNames(lapply(dirs, ),
+                                 basename(dirs)
+                                 )
+
+
+import_and_flatten <- function(dir) {
+
+kwb.satellite::import_rds(dir) %>%
+  kwb.satellite::flatten_results()
+}
 
 archive::archive_extract("https://data.geobasis-bb.de/geofachdaten/Wasser/Hydrologie/seen25.zip",
                          dir = "lakes_bb")
