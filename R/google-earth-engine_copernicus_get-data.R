@@ -232,7 +232,6 @@ gee_get_data <- function (collection,
           dplyr::arrange(datetime_start,
                          band)
 
-
         band_timeseries_wide <- band_timeseries %>%
           tidyr::pivot_wider(names_from = band,
                              values_from = value) %>%
@@ -243,7 +242,9 @@ gee_get_data <- function (collection,
                                      .key = "satellite_data")) %>%
           dplyr::bind_cols(tidyr::nest(metadata,
                                        .key = "satellite_metadata")) %>%
-          dplyr::bind_cols(tibble::tibble(shape_type = shape_type,
+          dplyr::bind_cols(tibble::tibble(satellite_data.nrow = nrow(band_timeseries_wide),
+                                          satellite_metadata.nrow = nrow(metadata),
+                                          shape_type = shape_type,
                                           spatial_fun = spatial_fun))
       },
       dbg = debug,
