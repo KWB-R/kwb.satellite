@@ -71,8 +71,8 @@ lakes_bb <- sf::read_sf("lakes_bb/Seen25_20211105/seen25.shp")
 
 csv_path <- system.file("extdata/seen25_selected.csv", package = "kwb.satellite")
 
-lakes_bb_selected <- readr::read_csv(csv_path, col_types = "c") %>%
-  dplyr::left_join(lakes_bb, by = "SEE_KZ")
+lakes_bb_selected <- lakes_bb %>%
+  dplyr::inner_join(readr::read_csv(csv_path, col_types = "c"), by = "SEE_KZ")
 
 
 ```
@@ -81,6 +81,19 @@ lakes_bb_selected <- readr::read_csv(csv_path, col_types = "c") %>%
 
 #### Single Core
 ```{r satellite_data_single, eval = ! is_gh_actions}
+
+plot_solar_azimut_angle <- function(res) {
+
+res %>% 
+ggplot2::ggplot(ggplot2::aes(x = datetime_start,
+                            y = MEAN_SOLAR_AZIMUTH_ANGLE,
+                            col = tile_id)) +
+  ggplot2::geom_point() +
+  ggplot2::geom_line() +
+  ggplot2::theme_bw()
+}
+
+
 reticulate::use_condaenv("ad4gd")
 
 library(rgee)
@@ -88,26 +101,30 @@ library(rgee)
 rgee::ee_Initialize()
 
 system.time(
-lakes_01_ptonsurface <- gee_get_data_for_years(
+lakes_01_ptonsurface <- kwb.satellite::gee_get_data_for_years(
   years = 2018,
   lakes = lakes_berlin[1, ],
   #bands = NULL,
   point_on_surface = TRUE)
 )
 
-dat <- lakes_01_ptonsurface$satellite_data[[1]] %>% 
-  dplyr::bind_cols(
-    lakes_01_ptonsurface$satellite_metadata[[1]]
-  )
+lakes_01_ptonsurface <- kwb.satellite::flatten_results(lakes_01_ptonsurface)
+plot_solar_azimut_angle(lakes_01_ptonsurface)
 
 
-dat %>% 
-ggplot2::ggplot(ggplot2::aes(x = datetime_start,
-                            y = MEAN_SOLAR_AZIMUTH_ANGLE,
-                            col = tile_id)) +
-  ggplot2::geom_point() +
-  ggplot2::geom_line() +
-  ggplot2::theme_bw()
+system.time(
+lakes_malte_test <- kwb.satellite::gee_get_data_for_years(
+  years = 2021:2024,
+  lakes = lakes_bb_selected[lakes_bb_selected$SEE_NAME == "Senftenberger See",],
+  point_on_surface = FALSE,
+  scale = 5,
+  col_lakename = "SEE_NAME",
+  debug = TRUE)
+)
+
+lakes_malte_test_flatten <- kwb.satellite::flatten_results(lakes_malte_test)
+
+plot_solar_azimut_angle(lakes_malte_test_flatten)
 
 ```
 
@@ -126,7 +143,6 @@ lakes_malte <- readr::read_csv(csv_path) %>%
 
 years <- 2017:2024
 #kwb.utils::hsOpenWindowsExplorer(exp_dir)
-
 
 system.time(
 lakes_malte_centroid <- kwb.satellite::gee_get_data_for_years(

@@ -46,6 +46,43 @@ kwb.satellite::import_rds(dir) %>%
   kwb.satellite::flatten_results()
 }
 
+
+tmp <- import_and_flatten("vignettes/gee/lakes_bb_selected_polygon/")
+tmp_flatten <- lapply(seq_along(length(tmp)), function(i) try(flatten_results[[i]]))
+is_try_error <- lapply(seq_along(tmp_flatten), function (i) inherits(tmp_flatten[[i]],'try-error'))
+tmp_flatten_error <- tmp[which(unlist(is_try_error))]
+
+
+lapply(1:nrow(tmp_flatten_error$`Senftenberger See_point_mean_2017-2024`),
+       function(i) {
+         nrow(tmp_flatten_error$`Senftenberger See_point_mean_2017-2024`[i,]$satellite_data[[1]]) -
+         nrow(tmp_flatten_error$`Senftenberger See_point_mean_2017-2024`[i,]$satellite_metadata[[1]])
+       }
+       )
+
+
+tmp$`Großer Beutelsee_point_mean_2017-2024`[1,]$satellite_metadata[[1]] %>%
+  tidyr::separate(col = "id", into = c("provider_name", "provider_collection", "id_short"),
+                  sep = "/",
+                  remove = FALSE) %>%
+  tidyr::separate(
+    col = "id_short",
+    into = c("datetime_start",
+             "datetime_end",
+             "tile_id"),
+    sep = "_"
+  ) %>%
+  dplyr::mutate(
+    datetime_start = lubridate::ymd_hms(datetime_start),
+    datetime_end = lubridate::ymd_hms(datetime_end)
+  ) %>%
+  dplyr::select(- tidyselect::all_of(c("provider_name","provider_collection")))
+
+
+dirs <- fs::dir_ls("vignettes/gee/lakes_bb_point_on_surface/", type = "directory")
+
+tmp <- lapply(dirs, function(dir) try(import_and_flatten(dir)))
+
 archive::archive_extract("https://data.geobasis-bb.de/geofachdaten/Wasser/Hydrologie/seen25.zip",
                          dir = "lakes_bb")
 lakes_bb <- sf::read_sf("lakes_bb/Seen25_20211105/seen25.shp")

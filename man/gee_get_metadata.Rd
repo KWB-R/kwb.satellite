@@ -10,7 +10,8 @@ gee_get_metadata(collection)
 \item{collection}{collection}
 }
 \value{
-tibble with metadata (to do: improve format of "geometry" column)
+tibble with metadata. In addition also the complex column
+"geometry_meta_org" is simplified and stored in the new column "geometry_meta_cleaned"
 }
 \description{
 Google Earth Engine: get metadata for collection

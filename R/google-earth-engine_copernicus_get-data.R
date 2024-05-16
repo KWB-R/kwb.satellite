@@ -237,8 +237,16 @@ gee_get_data <- function (collection,
                              values_from = value) %>%
           dplyr::mutate(geometry_filter = rgee::ee_as_sf(lake_gee))
 
+        dat_meta <- dplyr::left_join(band_timeseries_wide,
+                                     metadata,
+                                     by = c("datetime_start", "datetime_end", "tile_id")
+        )
+
+
         dplyr::bind_cols(lake,
-                         tidyr::nest(band_timeseries_wide,
+                         tidyr::nest(dat_meta,
+                                     .key = "satellite_data_metadata")) %>%
+          dplyr::bind_cols(tidyr::nest(band_timeseries_wide,
                                      .key = "satellite_data")) %>%
           dplyr::bind_cols(tidyr::nest(metadata,
                                        .key = "satellite_metadata")) %>%
