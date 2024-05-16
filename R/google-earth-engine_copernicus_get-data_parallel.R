@@ -57,7 +57,7 @@ gee_get_data_for_years_parallel <- function(
     n_year_splits = 2) {
 
 
-  geos <- tolower(sf::st_geometry_type(lakes_malte))
+  geos <- tolower(sf::st_geometry_type(lakes))
 
   shape_type <- if(all(geos == "point")) {
     "point"
