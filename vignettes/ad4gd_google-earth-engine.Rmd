@@ -141,7 +141,7 @@ csv_path <- system.file("extdata/lakes_bb_malte.csv", package = "kwb.satellite")
 lakes_malte <- readr::read_csv(csv_path) %>% 
   sf::st_as_sf(coords = c("long", "lat"),  crs = 4326)
 
-years <- 2017:2024
+years <- 2017:2023
 #kwb.utils::hsOpenWindowsExplorer(exp_dir)
 
 system.time(
@@ -241,24 +241,29 @@ saveRDS(lakes_berlin_polygon,
         fs::path_join(c(exp_dir, "../lakes_berlin_polygon.rds")))
 
 
-exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/lakes_bb_selected_point_on_surface"))
+exp_dir <- fs::path_join(c(getwd(), "gee/lakes_bb_selected_point_on_surface"))
+
+lakes_working <- stringr::str_split_fixed(basename(fs::dir_ls(exp_dir, type = "file",regexp = "\\.rds" )),pattern = "_point_on_surface", n = 2)[,1]
+
+lakes_bb_selected_failed <- lakes_bb_selected[!lakes_bb_selected$SEE_NAME %in% lakes_working,]
 
 system.time(
 lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
   years = years,
-  lakes = lakes_bb_selected,
+  lakes = lakes_bb_selected_failed,
   point_on_surface = TRUE,
   spatial_fun = "mean",
   col_lakename = "SEE_NAME",
   debug_dir = exp_dir, 
   export_dir = exp_dir,
-  debug = TRUE)
+  debug = TRUE,
+  n_year_splits = 3)
 )
 
 saveRDS(lakes_bb_point_on_surface, fs::path_join(c(exp_dir, "../lakes_bb_point_on_surface.rds")))
 
 
-exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/lakes_bb_selected_polygon"))
+exp_dir <- fs::path_join(c(getwd(), "gee/lakes_bb_selected_polygon"))
                            
 system.time(
 lakes_polygon <- kwb.satellite::gee_get_data_for_years_parallel(

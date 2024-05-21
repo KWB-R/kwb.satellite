@@ -78,6 +78,10 @@ gee_get_data_for_years_parallel <- function(
   stopifnot(ncores > 1)
   stopifnot(ncores <= parallel::detectCores())
 
+  if (ncores > nrow(lakes)) {
+    ncores <- nrow(lakes)
+  }
+
   # Prepare parallel processing
   cl <- parallel::makeCluster(ncores,
                               outfile = fs::path_join(c(debug_dir,
@@ -94,7 +98,7 @@ gee_get_data_for_years_parallel <- function(
       sink(tfile, append = FALSE)
     }
 
-    res <- gee_get_data_for_years(
+    res <- try(gee_get_data_for_years(
       years = years,
       lakes = lakes[idx,],
       image_collection = image_collection,
@@ -107,12 +111,19 @@ gee_get_data_for_years_parallel <- function(
       debug =  debug,
       ee_print = ee_print,
       n_year_splits = n_year_splits)
+      )
+
+    if(class(res) == "try-error") {
+      not_failed <- FALSE
+    } else {
+      not_failed <- TRUE
+    }
 
 
     if(debug) sink()
 
 
-    if(export_rds) {
+    if(export_rds && not_failed) {
       rds_name <- sprintf("%s_%s_%s_%4d-%4d.rds",
                           lakes[[col_lakename]][idx],
                           shape_type,
