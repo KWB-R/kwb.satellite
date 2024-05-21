@@ -96,18 +96,20 @@ Rustler</h4>
 <span>                                 <span class="st">"https://kwb-r.r-universe.dev"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Installing packages into 'D:/a/_temp/Library'</span></span>
 <span><span class="co">#&gt; (as 'lib' is unspecified)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   There is a binary version available but the source version is later:</span></span>
+<span><span class="co">#&gt;            binary source needs_compilation</span></span>
+<span><span class="co">#&gt; reticulate 1.36.1 1.37.0              TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; package 'geojsonsf' successfully unpacked and MD5 sums checked</span></span>
 <span><span class="co">#&gt; package 'rgee' successfully unpacked and MD5 sums checked</span></span>
-<span><span class="co">#&gt; package 'reticulate' successfully unpacked and MD5 sums checked</span></span>
-<span><span class="co">#&gt; Warning: cannot remove prior installation of package 'reticulate'</span></span>
-<span><span class="co">#&gt; Warning in file.copy(savedcopy, lib, recursive = TRUE): problem copying</span></span>
-<span><span class="co">#&gt; D:\a\_temp\Library\00LOCK\reticulate\libs\x64\reticulate.dll to</span></span>
-<span><span class="co">#&gt; D:\a\_temp\Library\reticulate\libs\x64\reticulate.dll: Permission denied</span></span>
-<span><span class="co">#&gt; Warning: restored 'reticulate'</span></span>
 <span><span class="co">#&gt; package 'kwb.python' successfully unpacked and MD5 sums checked</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The downloaded binary packages are in</span></span>
-<span><span class="co">#&gt;  C:\Users\runneradmin\AppData\Local\Temp\RtmpgvKOiV\downloaded_packages</span></span></code></pre></div>
+<span><span class="co">#&gt;  C:\Users\runneradmin\AppData\Local\Temp\RtmpcXZRzi\downloaded_packages</span></span>
+<span><span class="co">#&gt; installing the source package 'reticulate'</span></span>
+<span><span class="co">#&gt; Warning in install.packages(pkgs, repos = c("https://cloud.r-project.org", :</span></span>
+<span><span class="co">#&gt; installation of package 'reticulate' had non-zero exit status</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
@@ -117,7 +119,7 @@ Rustler</h4>
 <span>                                                  py <span class="op">=</span> <span class="st">"earthengine-api==0.1.370"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; * Installing Miniconda -- please wait a moment ...</span></span>
 <span><span class="co">#&gt; * Downloading "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe" ...</span></span>
-<span><span class="co">#&gt; + "C:\Users\runneradmin\AppData\Local\Temp\RtmpgvKOiV\Miniconda3-latest-Windows-x86_64.exe" /InstallationType=JustMe /AddToPath=0 /RegisterPython=0 /NoRegistry=1 /S /D=C:\Users\runneradmin\AppData\Local\r-miniconda</span></span>
+<span><span class="co">#&gt; + "C:\Users\runneradmin\AppData\Local\Temp\RtmpcXZRzi\Miniconda3-latest-Windows-x86_64.exe" /InstallationType=JustMe /AddToPath=0 /RegisterPython=0 /NoRegistry=1 /S /D=C:\Users\runneradmin\AppData\Local\r-miniconda</span></span>
 <span><span class="co">#&gt; + "C:/Users/runneradmin/AppData/Local/r-miniconda/condabin/conda.bat" update --yes --name base conda</span></span>
 <span><span class="co">#&gt; + "C:/Users/runneradmin/AppData/Local/r-miniconda/condabin/conda.bat" create --yes --name r-reticulate "python=3.10" numpy --quiet -c conda-forge</span></span>
 <span><span class="co">#&gt; * Miniconda has been successfully installed at "C:/Users/runneradmin/AppData/Local/r-miniconda".</span></span>
@@ -449,7 +451,7 @@ Rustler</h4>
 <span id="cb8-61"><a href="#cb8-61" tabindex="-1"></a>   rappdirs      <span class="dv">0</span>.<span class="fl">3.3</span>    [<span class="dv">90</span>m2021<span class="dv">-01-31</span> [<span class="dv">39</span>m  [<span class="dv">90</span>m[<span class="dv">1</span>] [<span class="dv">39</span>m  [<span class="dv">90</span><span class="fu">mCRAN</span> (R <span class="dv">4</span>.<span class="fl">4.0</span>) [<span class="dv">39</span>m</span>
 <span id="cb8-62"><a href="#cb8-62" tabindex="-1"></a>   Rcpp          <span class="dv">1</span>.<span class="fl">0.12</span>   [<span class="dv">90</span>m2024<span class="dv">-01-09</span> [<span class="dv">39</span>m  [<span class="dv">90</span>m[<span class="dv">1</span>] [<span class="dv">39</span>m  [<span class="dv">90</span><span class="fu">mCRAN</span> (R <span class="dv">4</span>.<span class="fl">4.0</span>) [<span class="dv">39</span>m</span>
 <span id="cb8-63"><a href="#cb8-63" tabindex="-1"></a>   readr         <span class="dv">2</span>.<span class="fl">1.5</span>    [<span class="dv">90</span>m2024<span class="dv">-01-10</span> [<span class="dv">39</span>m  [<span class="dv">90</span>m[<span class="dv">1</span>] [<span class="dv">39</span>m  [<span class="dv">90</span><span class="fu">mCRAN</span> (R <span class="dv">4</span>.<span class="fl">4.0</span>) [<span class="dv">39</span>m</span>
-<span id="cb8-64"><a href="#cb8-64" tabindex="-1"></a>   reticulate    <span class="dv">1</span>.<span class="fl">36.1</span>   [<span class="dv">90</span>m2024<span class="dv">-04-22</span> [<span class="dv">39</span>m  [<span class="dv">90</span>m[<span class="dv">1</span>] [<span class="dv">39</span>m  [<span class="dv">90</span><span class="fu">mCRAN</span> (R <span class="dv">4</span>.<span class="fl">4.0</span>) [<span class="dv">39</span>m</span>
+<span id="cb8-64"><a href="#cb8-64" tabindex="-1"></a>   reticulate    <span class="dv">1</span>.<span class="fl">37.0</span>   [<span class="dv">90</span>m2024<span class="dv">-05-21</span> [<span class="dv">39</span>m  [<span class="dv">90</span>m[<span class="dv">1</span>] [<span class="dv">39</span>m  [<span class="dv">90</span><span class="fu">mCRAN</span> (R <span class="dv">4</span>.<span class="fl">4.0</span>) [<span class="dv">39</span>m</span>
 <span id="cb8-65"><a href="#cb8-65" tabindex="-1"></a>   rlang         <span class="dv">1</span>.<span class="fl">1.3</span>    [<span class="dv">90</span>m2024<span class="dv">-01-10</span> [<span class="dv">39</span>m  [<span class="dv">90</span>m[<span class="dv">1</span>] [<span class="dv">39</span>m  [<span class="dv">90</span><span class="fu">mCRAN</span> (R <span class="dv">4</span>.<span class="fl">4.0</span>) [<span class="dv">39</span>m</span>
 <span id="cb8-66"><a href="#cb8-66" tabindex="-1"></a>   rmarkdown     <span class="fl">2.27</span>     [<span class="dv">90</span>m2024<span class="dv">-05-17</span> [<span class="dv">39</span>m  [<span class="dv">90</span>m[<span class="dv">1</span>] [<span class="dv">39</span>m  [<span class="dv">90</span><span class="fu">mCRAN</span> (R <span class="dv">4</span>.<span class="fl">4.0</span>) [<span class="dv">39</span>m</span>
 <span id="cb8-67"><a href="#cb8-67" tabindex="-1"></a>   sass          <span class="dv">0</span>.<span class="fl">4.9</span>    [<span class="dv">90</span>m2024<span class="dv">-03-15</span> [<span class="dv">39</span>m  [<span class="dv">90</span>m[<span class="dv">1</span>] [<span class="dv">39</span>m  [<span class="dv">90</span><span class="fu">mCRAN</span> (R <span class="dv">4</span>.<span class="fl">4.0</span>) [<span class="dv">39</span>m</span>
