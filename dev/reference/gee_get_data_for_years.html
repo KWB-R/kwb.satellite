@@ -71,7 +71,7 @@
 <span>  col_lakename <span class="op">=</span> <span class="st">"GEWNAME"</span>,</span>
 <span>  debug <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ee_print <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  n_year_splits <span class="op">=</span> <span class="fl">3</span></span>
+<span>  n_year_splits <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -127,7 +127,8 @@ water bodies)</p></dd>
 
 <dt>n_year_splits</dt>
 <dd><p>number of year splits per request. Required in case request
-uses too much images &gt; 400-500 per year (default: 3)</p></dd>
+uses too much images &gt; 400-500 per year (default: NULL, determined automatically within
+function. In case it should be overwritten by the user provide a meaningful integer number)</p></dd>
 
 </dl></div>
     <div class="section level2">
