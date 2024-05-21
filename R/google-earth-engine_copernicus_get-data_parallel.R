@@ -66,7 +66,7 @@ gee_get_data_for_years_parallel <- function(
   } else if (all(geos == "polygon") & point_on_surface == FALSE) {
     "polygon"
   } else if (all(geos == "polygon") & point_on_surface == TRUE) {
-    "point_on_surface"
+    "point-on-surface"
   } else {
     "unclear"
   }
