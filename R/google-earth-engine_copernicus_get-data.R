@@ -55,34 +55,43 @@ gee_get_data_for_years <- function(years = 2018,
 
   lapply(years, function(year) {
 
-    collection <- rgee::ee$ImageCollection(image_collection)
+    collection_year <- rgee::ee$ImageCollection(image_collection)
 
-    if(!is.null(bands)) collection <- collection$select(bands)
+    if(!is.null(bands)) collection_year <- collection_year$select(bands)
 
-    collection <- collection$filterBounds(rgee::sf_as_ee(lakes_boundary))
-
-    collection_year <- collection$filterDate(sprintf("%d-01-01", as.integer(year)),
-                          sprintf("%d-12-31", as.integer(year)))
+    collection_year <- collection_year$
+      filterBounds(rgee::sf_as_ee(lakes_boundary))$
+      filterDate(sprintf("%d-01-01", as.integer(year)),
+                 sprintf("%d-12-31", as.integer(year)))
 
     dat_year <- collection_year$getInfo()
 
     n_images_year <- length(dat_year$features)
     n_bands <- length(dat_year$features[[1]]$bands)
 
-    n_year_splits <- ceiling(n_bands*n_images_year/5000)
+    if(is.null(n_year_splits)) {
+      n_year_splits <- ceiling(n_bands*n_images_year/5000)
+
+      if (year == 2017) n_year_splits <- n_year_splits + 1
+    }
 
     dates <- split_year(year, n_year_splits)
 
     sat_dat_year <- lapply(seq_len(nrow(dates)), function(idx) {
 
-      collection <- collection$
+      collection_split <- rgee::ee$ImageCollection(image_collection)
+
+      if(!is.null(bands)) collection_split <- collection_split$select(bands)
+
+      collection_split <- collection_split$
+        filterBounds(rgee::sf_as_ee(lakes_boundary))$
         filterDate(dates$start[idx], dates$end[idx])
 
     if (debug && ee_print) {
-      rgee::ee_print(collection) # Useful for debugging.
+      rgee::ee_print(collection_split) # Useful for debugging.
     }
 
-    dat <- collection$getInfo()
+    dat <- collection_split$getInfo()
 
     n_images <-  length(dat$features)
     n_bands <- length(dat$features[[1]]$bands)
@@ -104,7 +113,7 @@ gee_get_data_for_years <- function(years = 2018,
     kwb.utils::catAndRun(messageText = msg_txt,
                          expr = {
                            stopifnot(n_images * n_bands <= 5000)
-                           gee_get_data(collection = collection,
+                           gee_get_data(collection = collection_split,
                                         lakes = lakes,
                                         point_on_surface = point_on_surface,
                                         spatial_fun = spatial_fun,
