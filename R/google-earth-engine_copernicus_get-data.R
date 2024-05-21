@@ -16,7 +16,8 @@
 #' @param debug print debug messages? (default: TRUE)
 #' @param ee_print show debug messages for "ee" (default: FALSE)
 #' @param n_year_splits  number of year splits per request. Required in case request
-#' uses too much images > 400-500 per year (default: 3)
+#' uses too much images > 400-500 per year (default: NULL, determined automatically within
+#' function. In case it should be overwritten by the user provide a meaningful integer number)
 #' @return list with data and metadata, each of them tibbles
 #' @export
 #' @importFrom rgee ee sf_as_ee ee_print
@@ -35,7 +36,7 @@ gee_get_data_for_years <- function(years = 2018,
                                    col_lakename = "GEWNAME",
                                    debug = TRUE,
                                    ee_print = FALSE,
-                                   n_year_splits = 3) {
+                                   n_year_splits = NULL) {
 
   stopifnot(spatial_fun %in% names(rgee::ee$Reducer))
 
@@ -54,16 +55,27 @@ gee_get_data_for_years <- function(years = 2018,
 
   lapply(years, function(year) {
 
+    collection <- rgee::ee$ImageCollection(image_collection)
+
+    if(!is.null(bands)) collection <- collection$select(bands)
+
+    collection <- collection$filterBounds(rgee::sf_as_ee(lakes_boundary))
+
+    collection_year <- collection$filterDate(sprintf("%d-01-01", as.integer(year)),
+                          sprintf("%d-12-31", as.integer(year)))
+
+    dat_year <- collection_year$getInfo()
+
+    n_images_year <- length(dat_year$features)
+    n_bands <- length(dat_year$features[[1]]$bands)
+
+    n_year_splits <- ceiling(n_bands*n_images_year/5000)
+
     dates <- split_year(year, n_year_splits)
 
     sat_dat_year <- lapply(seq_len(nrow(dates)), function(idx) {
 
-      collection <- rgee::ee$ImageCollection(image_collection)
-
-      if(!is.null(bands)) collection <- collection$select(bands)
-
       collection <- collection$
-        filterBounds(rgee::sf_as_ee(lakes_boundary))$
         filterDate(dates$start[idx], dates$end[idx])
 
     if (debug && ee_print) {

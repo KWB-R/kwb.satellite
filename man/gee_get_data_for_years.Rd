@@ -16,7 +16,7 @@ gee_get_data_for_years(
   col_lakename = "GEWNAME",
   debug = TRUE,
   ee_print = FALSE,
-  n_year_splits = 3
+  n_year_splits = NULL
 )
 }
 \arguments{
@@ -47,7 +47,8 @@ water bodies)}
 \item{ee_print}{show debug messages for "ee" (default: FALSE)}
 
 \item{n_year_splits}{number of year splits per request. Required in case request
-uses too much images > 400-500 per year (default: 3)}
+uses too much images > 400-500 per year (default: NULL, determined automatically within
+function. In case it should be overwritten by the user provide a meaningful integer number)}
 }
 \value{
 list with data and metadata, each of them tibbles

@@ -241,7 +241,7 @@ saveRDS(lakes_berlin_polygon,
         fs::path_join(c(exp_dir, "../lakes_berlin_polygon.rds")))
 
 
-exp_dir <- fs::path_join(c(getwd(), "gee/lakes_bb_selected_point_on_surface"))
+exp_dir <- fs::path_join(c(getwd(), "../gee/lakes_bb_selected_point_on_surface"))
 
 lakes_working <- stringr::str_split_fixed(basename(fs::dir_ls(exp_dir, type = "file",regexp = "\\.rds" )),pattern = "_point_on_surface", n = 2)[,1]
 
@@ -256,8 +256,7 @@ lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
   col_lakename = "SEE_NAME",
   debug_dir = exp_dir, 
   export_dir = exp_dir,
-  debug = TRUE,
-  n_year_splits = 3)
+  debug = TRUE)
 )
 
 saveRDS(lakes_bb_point_on_surface, fs::path_join(c(exp_dir, "../lakes_bb_point_on_surface.rds")))
