@@ -258,7 +258,8 @@ gee_get_data <- function (collection,
                      "tile_id",
                      "band1",
                      "band2"),
-            sep = "_"
+            sep = "_",
+            fill = "right"
           ) %>%
           dplyr::mutate(
             band = dplyr::if_else(is.na(band2),
