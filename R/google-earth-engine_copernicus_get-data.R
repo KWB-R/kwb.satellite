@@ -53,8 +53,6 @@ gee_get_data_for_years <- function(years = 2018,
     sf::st_bbox() %>%
     sf::st_as_sfc()
 
-  valid_splits_periods <- c(1:4,6,6,rep(12,6))
-
   lapply(years, function(year) {
 
     collection_year <- rgee::ee$ImageCollection(image_collection)
@@ -72,13 +70,11 @@ gee_get_data_for_years <- function(years = 2018,
     n_bands <- length(dat_year$features[[1]]$bands)
 
     if(is.null(n_year_splits)) {
-      number_year_splits <- ceiling(n_bands*n_images_year/5000)
+      number_year_splits <- ceiling(n_bands*n_images_year/5000) + 1
 
-      number_year_splits  <- valid_splits_periods[number_year_splits + 1]
     }
 
-    dates <- split_year(year, number_year_splits)
-
+    dates <- create_periods_in_year(year, number_year_splits)
 
     sat_dat_year <- kwb.utils::catAndRun(
       messageText = sprintf("Available images for year %d: %d",
