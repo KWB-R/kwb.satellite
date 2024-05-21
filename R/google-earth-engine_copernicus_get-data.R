@@ -53,6 +53,8 @@ gee_get_data_for_years <- function(years = 2018,
     sf::st_bbox() %>%
     sf::st_as_sfc()
 
+  valid_splits_periods <- c(1:4,6,6,rep(12,6))
+
   lapply(years, function(year) {
 
     collection_year <- rgee::ee$ImageCollection(image_collection)
@@ -72,12 +74,18 @@ gee_get_data_for_years <- function(years = 2018,
     if(is.null(n_year_splits)) {
       n_year_splits <- ceiling(n_bands*n_images_year/5000)
 
-      if (year == 2017) n_year_splits <- n_year_splits + 1
+      n_year_splits  <- valid_splits_periods[n_year_splits + 1]
     }
 
     dates <- split_year(year, n_year_splits)
 
-    sat_dat_year <- lapply(seq_len(nrow(dates)), function(idx) {
+
+    sat_dat_year <- kwb.utils::catAndRun(
+      messageText = sprintf("Available images for year %d: %d",
+                            year,
+                            n_images_year),
+      expr = {
+      lapply(seq_len(nrow(dates)), function(idx) {
 
       collection_split <- rgee::ee$ImageCollection(image_collection)
 
@@ -129,8 +137,12 @@ gee_get_data_for_years <- function(years = 2018,
                          newLine = 1L)
     }) %>%
       dplyr::bind_rows()
-    })  %>%
+    },
+    dbg = debug,
+    newLine = 1)  %>%
     dplyr::bind_rows()
+
+})
 
 }
 
@@ -244,13 +256,19 @@ gee_get_data <- function (collection,
             into = c("datetime_start",
                      "datetime_end",
                      "tile_id",
-                     "band"),
+                     "band1",
+                     "band2"),
             sep = "_"
           ) %>%
           dplyr::mutate(
+            band = dplyr::if_else(is.na(band2),
+                                  band1,
+                                  paste0(band1, "_", band2)),
             datetime_start = lubridate::ymd_hms(datetime_start),
             datetime_end = lubridate::ymd_hms(datetime_end)
           ) %>%
+          dplyr::select(! tidyselect::all_of(c("band1", "band2"))) %>%
+          dplyr::relocate("band", .before = "value") %>%
           dplyr::arrange(datetime_start,
                          band)
 

@@ -9,6 +9,8 @@
 #' split_year(2024, 12)
 #' split_year(2018, 6)
 split_year <- function(year, num_periods) {
+
+  stopifnot(num_periods %in% c(1:4,6,12))
   # Initialize vectors to store start and end dates of each period
   period_starts <- vector(mode = "list", length = num_periods)
   period_ends <- vector(mode = "list", length = num_periods)

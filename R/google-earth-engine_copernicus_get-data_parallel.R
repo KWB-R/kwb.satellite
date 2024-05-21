@@ -26,7 +26,8 @@
 #' @param ncores number of cores for parallel processinfg (default:
 #' parallel::detectCores() - 1)
 #' @param n_year_splits  number of year splits per request. Required in case request
-#' uses too much images > 400-500 per year (default: 2)
+#' uses too much images > 400-500 per year (default: NULL, determined automatically within
+#' function. In case it should be overwritten by the user provide a meaningful integer number)
 #' @return list with data and metadata, each of them tibbles
 #' @export
 #' @importFrom parallel detectCores makeCluster stopCluster parLapply clusterEvalQ
@@ -55,7 +56,7 @@ gee_get_data_for_years_parallel <- function(
     export_rds = TRUE,
     export_dir = tempdir(),
     ncores = parallel::detectCores() - 1,
-    n_year_splits = 3) {
+    n_year_splits = NULL) {
 
 
   geos <- tolower(sf::st_geometry_type(lakes))

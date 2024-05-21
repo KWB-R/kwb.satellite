@@ -22,7 +22,7 @@ gee_get_data_for_years_parallel(
   export_rds = TRUE,
   export_dir = tempdir(),
   ncores = parallel::detectCores() - 1,
-  n_year_splits = 3
+  n_year_splits = NULL
 )
 }
 \arguments{
@@ -62,7 +62,8 @@ for naming result list? (default: TRUE)}
 parallel::detectCores() - 1)}
 
 \item{n_year_splits}{number of year splits per request. Required in case request
-uses too much images > 400-500 per year (default: 2)}
+uses too much images > 400-500 per year (default: NULL, determined automatically within
+function. In case it should be overwritten by the user provide a meaningful integer number)}
 
 \item{export_fst}{save sat data into fst object for each lake?}
 }
