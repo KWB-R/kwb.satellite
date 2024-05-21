@@ -72,12 +72,12 @@ gee_get_data_for_years <- function(years = 2018,
     n_bands <- length(dat_year$features[[1]]$bands)
 
     if(is.null(n_year_splits)) {
-      n_year_splits <- ceiling(n_bands*n_images_year/5000)
+      number_year_splits <- ceiling(n_bands*n_images_year/5000)
 
-      n_year_splits  <- valid_splits_periods[n_year_splits + 1]
+      number_year_splits  <- valid_splits_periods[number_year_splits + 1]
     }
 
-    dates <- split_year(year, n_year_splits)
+    dates <- split_year(year, number_year_splits)
 
 
     sat_dat_year <- kwb.utils::catAndRun(
