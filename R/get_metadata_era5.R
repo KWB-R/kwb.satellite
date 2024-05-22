@@ -19,7 +19,7 @@ get_metadata_era5 <- function(grib_file)
 
   info <- gdalUtilities::gdalinfo(grib_file)
 
-  select_pattern <- paste0(c(
+  select_pattern <- paste0(collapse = "|", c(
     "Band",
     "GRIB_COMMENT",
     "GRIB_ELEMENT",
@@ -28,9 +28,7 @@ get_metadata_era5 <- function(grib_file)
     "GRIB_VALID_TIME",
     "GRIB_SHORT_NAME",
     "GRIB_UNIT"
-  ),
-  collapse = "|"
-  )
+  ))
 
   #Filter and retrieve the information of interest (as seen here).
   grib1 <- as.data.frame(info)

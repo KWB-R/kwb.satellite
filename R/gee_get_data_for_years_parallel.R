@@ -69,11 +69,11 @@ gee_get_data_for_years_parallel <- function(
 {
   geos <- tolower(sf::st_geometry_type(lakes))
 
-  shape_type <- if(all(geos == "point")) {
+  shape_type <- if (all(geos == "point")) {
     "point"
-  } else if (all(geos == "polygon") & point_on_surface == FALSE) {
+  } else if (all(geos == "polygon") && isFALSE(point_on_surface)) {
     "polygon"
-  } else if (all(geos == "polygon") & point_on_surface == TRUE) {
+  } else if (all(geos == "polygon") && isTRUE(point_on_surface)) {
     "point-on-surface"
   } else {
     "unclear"
@@ -84,11 +84,13 @@ gee_get_data_for_years_parallel <- function(
 
   stopifnot(spatial_fun %in% names(rgee::ee$Reducer))
 
-  stopifnot(ncores > 1)
+  stopifnot(ncores > 1L)
   stopifnot(ncores <= parallel::detectCores())
 
-  if (ncores > nrow(lakes)) {
-    ncores <- nrow(lakes)
+  n_lakes <- nrow(lakes)
+
+  if (ncores > n_lakes) {
+    ncores <- n_lakes
   }
 
   # Prepare parallel processing
@@ -124,11 +126,7 @@ gee_get_data_for_years_parallel <- function(
       n_year_splits = n_year_splits
     ))
 
-    if (any(class(res) == "try-error")) {
-      not_failed <- FALSE
-    } else {
-      not_failed <- TRUE
-    }
+    success <- !inherits(res, "try-error")
 
     if (debug) {
       sink()
@@ -136,7 +134,8 @@ gee_get_data_for_years_parallel <- function(
 
     return_obj <- NULL
 
-    if (export_rds && not_failed) {
+    if (export_rds && success) {
+
       rds_name <- sprintf(
         "%s_%s_%s_scale-%dm_%4d-%4d.rds",
         lakes[[col_lakename]][idx],
@@ -157,11 +156,11 @@ gee_get_data_for_years_parallel <- function(
       return_obj <- rds_path
     }
 
-    if (return_list | !(export_rds && not_failed)) {
+    if (return_list || !(export_rds && success)) {
       return_obj <- res
     }
 
-    return(return_obj)
+    return_obj
   }
 
   # Initialize necessary packages and environments on each cluster
@@ -176,20 +175,21 @@ gee_get_data_for_years_parallel <- function(
 
   # Prepare parallel processing
   doParallel::registerDoParallel(cl)
+
   library(foreach)
 
   # Run the parallel processing
-  sat_data <- kwb.utils::catAndRun(
+  kwb.utils::catAndRun(
     sprintf(
       "Downloading satellite data for %d lakes in parallel on %d cores",
-      nrow(lakes),
+      n_lakes,
       ncores
     ),
     dbg = debug,
     expr = {
 
       sat_data <- foreach::foreach(
-        idx = seq_len(nrow(lakes)),
+        idx = seq_len(n_lakes),
         .combine = "c"
       ) %dopar% {
         my_fun(idx)
@@ -199,7 +199,7 @@ gee_get_data_for_years_parallel <- function(
       doParallel::stopImplicitCluster()
 
       if (set_lakenames_as_list_indices) {
-        sat_data <- setNames(sat_data, lakes[[col_lakename]])
+        names(sat_data) <- lakes[[col_lakename]]
       }
 
       sat_data
