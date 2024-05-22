@@ -15,12 +15,18 @@ flatten_results <- function(
     cols_unnest = "satellite_data_metadata"
 )
 {
-  satellite_columns <- c("satellite_data", "satellite_metadata")
+  cols_satellite <- c("satellite_data", "satellite_metadata")
 
-  sat_data_list %>%
-    dplyr::bind_rows() %>%
-    tidyr::unnest(
-      tidyselect::all_of(cols_unnest),
-      names_sep = if (all(satellite_columns %in% cols_unnest)) "." # else NULL
-    )
+  sat_data_df_nested <- sat_data_list %>%
+    dplyr::bind_rows()
+
+  seq_len(nrow(sat_data_df_nested)) %>%
+    lapply(function(i) {
+      tidyr::unnest(
+        sat_data_df_nested[i, ],
+        tidyselect::all_of(cols_unnest),
+        names_sep = if (all(cols_satellite %in% cols_unnest)) "." # else NULL
+      )
+    }) %>%
+    dplyr::bind_rows()
 }

@@ -173,7 +173,7 @@ saveRDS(lakes_malte_points_parallel,
 lakes_selected <- lakes_bb %>% 
   dplyr::filter(SEE_KZ %in% lakes_malte$SEE_KZ)
 
-exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/lakes_bb_point_on_surface"))
+exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/lakes-bb_point-on-surface"))
 
 system.time(
 lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
@@ -187,9 +187,9 @@ lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
   debug = TRUE)
 )
 
-saveRDS(lakes_bb_point_on_surface, fs::path_join(c(exp_dir, "../lakes_bb_point_on_surface.rds")))
+saveRDS(lakes_bb_point_on_surface, fs::path_join(c(exp_dir, "../lakes-bb_point-on-surface.rds")))
 
-exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/lakes_bb_polygon"))
+exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/lakes-bb_polygon"))
 
 system.time(
 lakes_bb_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
@@ -202,8 +202,6 @@ lakes_bb_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
   export_dir = exp_dir,
   debug = TRUE)
 )
-
-saveRDS(lakes_bb_polygon, fs::path_join(c(exp_dir, "../lakes_bb_polygon.rds")))
 
 
 exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/berlin_point"))
@@ -241,16 +239,20 @@ saveRDS(lakes_berlin_polygon,
         fs::path_join(c(exp_dir, "../lakes_berlin_polygon.rds")))
 
 
-exp_dir <- fs::path_join(c(getwd(), "../gee/lakes_bb_selected_point_on_surface"))
+exp_dir <- fs::path_join(c(getwd(), "gee/lakes-bb-selected_point-on-surface"))
+
+fs::dir_create(exp_dir)
 
 lakes_working <- stringr::str_split_fixed(basename(fs::dir_ls(exp_dir, type = "file",regexp = "\\.rds" )),pattern = "_point_on_surface", n = 2)[,1]
 
 lakes_bb_selected_failed <- lakes_bb_selected[!lakes_bb_selected$SEE_NAME %in% lakes_working,]
 
+lakes_bb_selected_failed <- lakes_bb_selected[lakes_bb_selected$SEE_NAME %in% c("Netzowsee", "Petznicksee"),]
+
 system.time(
 lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
-  years = years,
-  lakes = lakes_bb_selected_failed,
+  years = 2024,
+  lakes = lakes_bb_selected[1:7,],
   point_on_surface = TRUE,
   spatial_fun = "mean",
   col_lakename = "SEE_NAME",
