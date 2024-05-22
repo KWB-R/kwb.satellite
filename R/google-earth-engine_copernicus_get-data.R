@@ -70,11 +70,11 @@ gee_get_data_for_years <- function(years = 2018,
     n_bands <- length(dat_year$features[[1]]$bands)
 
     if(is.null(n_year_splits)) {
-      number_year_splits <- ceiling(n_bands*n_images_year/5000) + 1
+      n_periods <- ceiling(n_bands*n_images_year/5000) + 1
 
     }
 
-    dates <- create_periods_in_year(year, number_year_splits)
+    dates <- create_periods_in_year(year, n_periods)
 
     sat_dat_year <- kwb.utils::catAndRun(
       messageText = sprintf("Available images for year %d: %d",
