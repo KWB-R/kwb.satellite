@@ -12,28 +12,29 @@
 #' @importFrom rlang .data
 #' @seealso Code taken from https://gis.stackexchange.com/a/360652
 #'
-get_metadata_era5 <- function(grib_file) {
-
+get_metadata_era5 <- function(grib_file)
+{
   ### Code copied from:
   ### https://gis.stackexchange.com/questions/360547/era5-grib-file-how-to-know-what-each-band-means
 
   info <- gdalUtilities::gdalinfo(grib_file)
 
-  select_pattern <- paste0(c("Band",
-                             "GRIB_COMMENT",
-                             "GRIB_ELEMENT",
-                             "GRIB_FORECAST_SECONDS",
-                             "GRIB_REF_TIME",
-                             "GRIB_VALID_TIME",
-                             "GRIB_SHORT_NAME",
-                             "GRIB_UNIT"),
-                           collapse = "|")
+  select_pattern <- paste0(c(
+    "Band",
+    "GRIB_COMMENT",
+    "GRIB_ELEMENT",
+    "GRIB_FORECAST_SECONDS",
+    "GRIB_REF_TIME",
+    "GRIB_VALID_TIME",
+    "GRIB_SHORT_NAME",
+    "GRIB_UNIT"
+  ),
+  collapse = "|"
+  )
 
   #Filter and retrieve the information of interest (as seen here).
   grib1 <- as.data.frame(info)
-  grib1 <- as.data.frame(
-    grib1[grep(pattern = select_pattern, x = info), ]
-  )
+  grib1 <- as.data.frame(grib1[grep(pattern = select_pattern, x = info), ])
 
   colnames(grib1) <- c('raw_')
 
@@ -62,8 +63,8 @@ get_metadata_era5 <- function(grib_file) {
         is_grib_v ~ gsub(".*= (.+) sec.*", "\\1", raw_),
         is_grib_s ~ sub(".*=", "", raw_),
         is_grib_u ~ sub(".*=", "", raw_) %>%
-                    stringr::str_remove("\\[") %>%
-                    stringr::str_remove("\\]")
+          stringr::str_remove("\\[") %>%
+          stringr::str_remove("\\]")
       ),
       column = dplyr::case_when(
         is_band ~ 'band',
@@ -92,11 +93,22 @@ get_metadata_era5 <- function(grib_file) {
     values_from = "content"
   ) %>%
     dplyr::mutate(
-      time_ref = as.POSIXct(as.numeric(.data$time_ref), origin = "1970-01-01", tz = "UTC"),
-      time_valid = as.POSIXct(as.numeric(.data$time_valid), origin = "1970-01-01", tz = "UTC"),
+      time_ref = as.POSIXct(
+        as.numeric(.data$time_ref),
+        origin = "1970-01-01",
+        tz = "UTC"
+      ),
+      time_valid = as.POSIXct(
+        as.numeric(.data$time_valid),
+        origin = "1970-01-01",
+        tz = "UTC"
+      ),
       time_forecast = .data$time_ref + as.numeric(.data$forecast_seconds),
-      variable = stringr::str_remove(.data$variable_unit,
-                                     pattern = "\\s+\\[.*\\]$"))
+      variable = stringr::str_remove(
+        .data$variable_unit,
+        pattern = "\\s+\\[.*\\]$"
+      )
+    )
 
   grib1 <- grib1[, -1]
 
