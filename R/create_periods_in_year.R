@@ -19,11 +19,10 @@ create_periods_in_year <- function(year, n_periods = 4L)
   n_dates <- n_periods + 1L
 
   today <- Sys.Date()
-  this_year <- as.integer(format(today, format = "%Y"))
 
   dates <- seq.Date(
     from = as_date("01-01"),
-    to = ifelse(year == this_year, today, as_date("12-31")),
+    to = ifelse(is_this_year(year), today, as_date("12-31")),
     length.out = n_dates
   )
 

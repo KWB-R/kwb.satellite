@@ -82,7 +82,7 @@ gee_get_data_for_years <- function(
 
     if (is.null(n_year_splits)) {
       n_periods <- ceiling(n_bands * n_images_year / 5000) + 1L
-      if (as.integer(year) == as.integer(format(Sys.Date(), format = "%Y"))) {
+      if (is_this_year(year)) {
         n_periods <- ceiling(n_periods * lubridate::yday(Sys.Date()) / 365)
       }
     }
