@@ -10,17 +10,17 @@
 #' @importFrom dplyr bind_rows
 #' @importFrom tidyr unnest
 #' @importFrom sf st_polygon st_sfc st_set_crs
-flatten_results <- function(sat_data_list,
-                            cols_unnest = "satellite_data_metadata") {
-
-  if(sum(c("satellite_data", "satellite_metadata") %in% cols_unnest) == 2) {
-    names_sep <- "."
-  } else {
-    names_sep <- NULL
-  }
+flatten_results <- function(
+    sat_data_list,
+    cols_unnest = "satellite_data_metadata"
+)
+{
+  satellite_columns <- c("satellite_data", "satellite_metadata")
 
   sat_data_list %>%
     dplyr::bind_rows() %>%
-    tidyr::unnest(tidyselect::all_of(cols_unnest),
-                  names_sep = names_sep)
+    tidyr::unnest(
+      tidyselect::all_of(cols_unnest),
+      names_sep = if (all(satellite_columns %in% cols_unnest)) "." # else NULL
+    )
 }
