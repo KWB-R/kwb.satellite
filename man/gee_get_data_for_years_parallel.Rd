@@ -14,7 +14,8 @@ gee_get_data_for_years_parallel(
   spatial_fun = "mean",
   scale = 10,
   via = "getInfo",
-  col_lakename = "GEWNAME",
+  col_lakename = "SEE_NAME",
+  col_lakeid = "SEE_KZ",
   set_lakenames_as_list_indices = TRUE,
   debug = TRUE,
   debug_dir = tempdir(),
@@ -47,7 +48,10 @@ format: as.list(c("QA60", paste0("B", 1:6)))}
 or google cloud storage)}
 
 \item{col_lakename}{col_lakename ("GEWNAME", used by Berlin authority for surface
-water bodies) use "SEE_NAME" for Brandenburg lakes}
+water bodies) use "SEE_NAME" for Brandenburg lakes (default: "SEE_NAME")}
+
+\item{col_lakeid}{("GEWRNEU", used by Berlin authority for surface
+water bodies) use "SEE_KZ" for Brandenburg lakes (default: "SEE_KZ")}
 
 \item{set_lakenames_as_list_indices}{should lake names of "col_lakename" be used
 for naming result list? (default: TRUE)}

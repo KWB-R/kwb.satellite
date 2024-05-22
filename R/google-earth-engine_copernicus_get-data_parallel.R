@@ -12,7 +12,9 @@
 #' @param via via (default: "getInfo"), other options use google cloud (google drive
 #' or google cloud storage)
 #' @param col_lakename col_lakename ("GEWNAME", used by Berlin authority for surface
-#' water bodies) use "SEE_NAME" for Brandenburg lakes
+#' water bodies) use "SEE_NAME" for Brandenburg lakes (default: "SEE_NAME")
+#' @param col_lakeid ("GEWRNEU", used by Berlin authority for surface
+#' water bodies) use "SEE_KZ" for Brandenburg lakes (default: "SEE_KZ")
 #' @param set_lakenames_as_list_indices should lake names of "col_lakename" be used
 #' for naming result list? (default: TRUE)
 #' @param debug show debug messages (default: TRUE)
@@ -49,7 +51,8 @@ gee_get_data_for_years_parallel <- function(
     spatial_fun = "mean",
     scale = 10,
     via = "getInfo",
-    col_lakename = "GEWNAME",
+    col_lakename = "SEE_NAME",
+    col_lakeid = "SEE_KZ",
     set_lakenames_as_list_indices = TRUE,
     debug = TRUE,
     debug_dir = tempdir(),
@@ -127,9 +130,24 @@ gee_get_data_for_years_parallel <- function(
 
     return_obj <- NULL
 
+
+    lake_idx <- if(is.null(lakes[[col_lakeid]][idx])) {
+      sprintf(paste0("%0", nchar(nrow(lakes_bb_selected)), "d_"), idx)
+    } else {
+      ""
+    }
+
+    lake_id <- if(!is.null(lakes[[col_lakeid]][idx])) {
+      paste0(lakes[[col_lakeid]][idx], "_")
+    } else {
+      ""
+    }
+
     if(export_rds && not_failed) {
-      rds_name <- sprintf("%s_%s_%s_scale-%dm_%4d-%4d.rds",
+      rds_name <- sprintf("%s%s_%s%s_%s_scale-%dm_%4d-%4d.rds",
+                          lake_idx,
                           lakes[[col_lakename]][idx],
+                          lake_id,
                           shape_type,
                           spatial_fun,
                           scale,

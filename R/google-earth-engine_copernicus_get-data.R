@@ -12,7 +12,7 @@
 #' @param via via (default: "getInfo"), other options use google cloud (google drive
 #' or google cloud storage)
 #' @param col_lakename col_lakename ("GEWNAME", used by Berlin authority for surface
-#' water bodies)
+#' water bodies) use "SEE_NAME" for Brandenburg lakes (default: "SEE_NAME")
 #' @param debug print debug messages? (default: TRUE)
 #' @param ee_print show debug messages for "ee" (default: FALSE)
 #' @param n_year_splits  number of year splits per request. Required in case request
@@ -34,7 +34,7 @@ gee_get_data_for_years <- function(years = 2018,
                                    spatial_fun = "mean",
                                    scale = 10,
                                    via = "getInfo",
-                                   col_lakename = "GEWNAME",
+                                   col_lakename = "SEE_NAME",
                                    debug = TRUE,
                                    ee_print = FALSE,
                                    n_year_splits = NULL) {
@@ -157,7 +157,7 @@ gee_get_data_for_years <- function(years = 2018,
 #' \url{https://developers.google.com/earth-engine/guides/scale}
 #' @param via via (default: "getInfo"), other options use google cloud storage
 #' @param col_lakename col_lakename ("GEWNAME", used by Berlin authority for surface
-#' water bodies)
+#' water bodies) use "SEE_NAME" for Brandenburg lakes (default: "SEE_NAME")
 #' @param debug print debug messages? (default: TRUE)
 #'
 #' @return tibble
@@ -177,7 +177,7 @@ gee_get_data <- function (collection,
                           spatial_fun = "mean",
                           scale = 10,
                           via = "getInfo",
-                          col_lakename = "GEWNAME",
+                          col_lakename = "SEE_NAME",
                           debug = TRUE) {
 
   stopifnot(spatial_fun %in% names(rgee::ee$Reducer))

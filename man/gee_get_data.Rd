@@ -11,7 +11,7 @@ gee_get_data(
   spatial_fun = "mean",
   scale = 10,
   via = "getInfo",
-  col_lakename = "GEWNAME",
+  col_lakename = "SEE_NAME",
   debug = TRUE
 )
 }
@@ -30,7 +30,7 @@ gee_get_data(
 \item{via}{via (default: "getInfo"), other options use google cloud storage}
 
 \item{col_lakename}{col_lakename ("GEWNAME", used by Berlin authority for surface
-water bodies)}
+water bodies) use "SEE_NAME" for Brandenburg lakes (default: "SEE_NAME")}
 
 \item{debug}{print debug messages? (default: TRUE)}
 }

@@ -13,7 +13,7 @@ gee_get_data_for_years(
   spatial_fun = "mean",
   scale = 10,
   via = "getInfo",
-  col_lakename = "GEWNAME",
+  col_lakename = "SEE_NAME",
   debug = TRUE,
   ee_print = FALSE,
   n_year_splits = NULL
@@ -40,7 +40,7 @@ format: as.list(c("QA60", paste0("B", 1:6)))}
 or google cloud storage)}
 
 \item{col_lakename}{col_lakename ("GEWNAME", used by Berlin authority for surface
-water bodies)}
+water bodies) use "SEE_NAME" for Brandenburg lakes (default: "SEE_NAME")}
 
 \item{debug}{print debug messages? (default: TRUE)}
 
