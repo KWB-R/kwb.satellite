@@ -263,13 +263,12 @@ gee_get_data <- function (
             rgee::sf_as_ee()
         }
 
-        collection_lake <- if (nrow(lakes) > 1L) {
+        metadata <- if (nrow(lakes) > 1L) {
           collection$filterBounds(lake_gee)
         } else {
           collection
-        }
-
-        metadata <- gee_get_metadata(collection_lake)
+        } %>%
+          gee_get_metadata()
 
         image_extract <- rgee::ee_extract(
           x = collection,
