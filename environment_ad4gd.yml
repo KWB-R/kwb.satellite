@@ -23,7 +23,7 @@ dependencies:
   - pthreads-win32=2.9.1=hfa6e2cd_3
   - python=3.12.2=h2628c8c_0_cpython
   - python_abi=3.12=4_cp312
-  - setuptools=69.5.1=pyhd8ed1ab_0
+  - setuptools=70.0.0=pyhd8ed1ab_0
   - tbb=2021.12.0=hc790b64_1
   - tk=8.6.13=h5226925_1
   - tzdata=2024a=h0c530f3_0

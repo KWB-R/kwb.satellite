@@ -76,7 +76,8 @@
 <span>  export_rds <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  export_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>,</span>
-<span>  n_year_splits <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  n_year_splits <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  return_list <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -118,7 +119,8 @@ or google cloud storage)</p></dd>
 
 
 <dt>col_lakename</dt>
-<dd><p>col_lakename (default: "GEWNAME")</p></dd>
+<dd><p>col_lakename ("GEWNAME", used by Berlin authority for surface
+water bodies) use "SEE_NAME" for Brandenburg lakes</p></dd>
 
 
 <dt>set_lakenames_as_list_indices</dt>
@@ -138,6 +140,10 @@ for naming result list? (default: TRUE)</p></dd>
 <dd><p>show debug messages for "ee" (default: FALSE)</p></dd>
 
 
+<dt>export_rds</dt>
+<dd><p>save sat data into rds object for each lake (default: TRUE)</p></dd>
+
+
 <dt>export_dir</dt>
 <dd><p>directory where to save data for each lake (default: tempdir())</p></dd>
 
@@ -153,15 +159,18 @@ uses too much images &gt; 400-500 per year (default: NULL, determined automatica
 function. In case it should be overwritten by the user provide a meaningful integer number)</p></dd>
 
 
-<dt>export_fst</dt>
-<dd><p>save sat data into fst object for each lake?</p></dd>
+<dt>return_list</dt>
+<dd><p>should results be provided as R list? (default: FALSE). If FALSE,
+the rds_path to the exported data is provided in case export_rds is set to TRUE</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>list with data and metadata, each of them tibbles</p>
+<p>list with data and metadata, each of them tibbles (if return_list = TRUE),
+If FALSE, the rds_path to the exported data is provided in case export_rds is
+set to TRUE. In case an error occurs NULL is returned</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
