@@ -25,6 +25,7 @@
 #' @importFrom sf st_transform st_bbox st_as_sfc st_as_sf
 #' @importFrom kwb.utils catAndRun
 #' @importFrom stats setNames
+#' @importFrom lubridate yday
 gee_get_data_for_years <- function(years = 2018,
                                    lakes,
                                    image_collection = "COPERNICUS/S2_SR_HARMONIZED",
@@ -72,6 +73,8 @@ gee_get_data_for_years <- function(years = 2018,
     if(is.null(n_year_splits)) {
       n_periods <- ceiling(n_bands*n_images_year/5000) + 1
 
+      if(as.integer(year) == as.integer(format(Sys.Date(), format = "%Y")))
+        n_periods <- ceiling(n_periods * lubridate::yday(Sys.Date())/365)
     }
 
     dates <- create_periods_in_year(year, n_periods)
@@ -104,13 +107,14 @@ gee_get_data_for_years <- function(years = 2018,
     stopifnot(n_bands > 0)
 
     msg_txt <- sprintf(paste0("Downloading data for %d lake(s) for year '%d' (%s - %s) and",
-                              " spatial aggregation function '%s' (number_of_images:",
+                              " spatial aggregation function '%s' with scale %d m (number_of_images:",
                               "%d, number_of_bands: %d)"),
                        nrow(lakes),
                        year,
                        dates$start[idx],
                        dates$end[idx],
                        spatial_fun,
+                       scale,
                        n_images,
                        n_bands)
 
@@ -131,14 +135,14 @@ gee_get_data_for_years <- function(years = 2018,
                          },
                          dbg = debug,
                          newLine = 1L)
-    }) %>%
-      dplyr::bind_rows()
-    },
+    })},
     dbg = debug,
     newLine = 1)  %>%
     dplyr::bind_rows()
 
-})
+    sat_dat_year
+}) %>%
+    dplyr::bind_rows()
 
 }
 
@@ -204,7 +208,7 @@ gee_get_data <- function (collection,
             messageText = sprintf("convert '%s' to point with 'sf::st_point_on_surface()'",
                                   shape_type),
             expr = {
-              shape_type <- sprintf("%s_to_point_on_surface", shape_type)
+              shape_type <- sprintf("%s_to_point-on-surface", shape_type)
               x <- lake %>%
                 sf::st_transform(25833) %>%
                 sf::st_point_on_surface() %>%
@@ -290,7 +294,8 @@ gee_get_data <- function (collection,
           dplyr::bind_cols(tibble::tibble(satellite_data.nrow = nrow(band_timeseries_wide),
                                           satellite_metadata.nrow = nrow(metadata),
                                           shape_type = shape_type,
-                                          spatial_fun = spatial_fun))
+                                          spatial_fun = spatial_fun,
+                                          scale = scale))
       },
       dbg = debug,
       newLine = 1L

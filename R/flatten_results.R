@@ -19,8 +19,16 @@ flatten_results <- function(sat_data_list,
     names_sep <- NULL
   }
 
-  sat_data_list %>%
-    dplyr::bind_rows() %>%
-    tidyr::unnest(tidyselect::all_of(cols_unnest),
-                  names_sep = names_sep)
+  sat_data_df_nested <- sat_data_list %>%
+    dplyr::bind_rows()
+
+
+  lapply(seq_len(nrow(sat_data_df_nested)),
+         function(i) {
+           sat_data_df_nested[i, ] %>%
+             tidyr::unnest(tidyselect::all_of(cols_unnest),
+                           names_sep = names_sep)
+         }) %>%
+    dplyr::bind_rows()
+
 }

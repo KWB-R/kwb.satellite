@@ -28,8 +28,8 @@ create_periods_in_year <- function(year, n_periods = 4L)
   starts <- dates[-n_dates]
 
   data.frame(
-    start = starts,
-    end = kwb.utils::startsToEnds(starts, lastStop = dates[n_dates])
+    start = as.character(starts),
+    end = as.character(kwb.utils::startsToEnds(starts, lastStop = dates[n_dates]))
   )
 
 }

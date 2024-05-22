@@ -12,23 +12,24 @@
 #' @param via via (default: "getInfo"), other options use google cloud (google drive
 #' or google cloud storage)
 #' @param col_lakename col_lakename ("GEWNAME", used by Berlin authority for surface
-#' water bodies)
-#' @param debug print debug messages? (default: TRUE)
-#'
-#' @param col_lakename col_lakename (default: "GEWNAME")
+#' water bodies) use "SEE_NAME" for Brandenburg lakes
 #' @param set_lakenames_as_list_indices should lake names of "col_lakename" be used
 #' for naming result list? (default: TRUE)
 #' @param debug show debug messages (default: TRUE)
 #' @param debug_dir directory where to save (default: tempdir())
 #' @param ee_print show debug messages for "ee" (default: FALSE)
-#' @param export_fst save sat data into fst object for each lake?
+#' @param export_rds save sat data into rds object for each lake (default: TRUE)
 #' @param export_dir directory where to save data for each lake (default: tempdir())
 #' @param ncores number of cores for parallel processinfg (default:
 #' parallel::detectCores() - 1)
 #' @param n_year_splits  number of year splits per request. Required in case request
 #' uses too much images > 400-500 per year (default: NULL, determined automatically within
 #' function. In case it should be overwritten by the user provide a meaningful integer number)
-#' @return list with data and metadata, each of them tibbles
+#' @param return_list should results be provided as R list? (default: FALSE). If FALSE,
+#' the rds_path to the exported data is provided in case export_rds is set to TRUE
+#' @return list with data and metadata, each of them tibbles (if return_list = TRUE),
+#' If FALSE, the rds_path to the exported data is provided in case export_rds is
+#' set to TRUE. In case an error occurs NULL is returned
 #' @export
 #' @importFrom parallel detectCores makeCluster stopCluster parLapply clusterEvalQ
 #' clusterExport
@@ -56,7 +57,8 @@ gee_get_data_for_years_parallel <- function(
     export_rds = TRUE,
     export_dir = tempdir(),
     ncores = parallel::detectCores() - 1,
-    n_year_splits = NULL) {
+    n_year_splits = NULL,
+    return_list = FALSE) {
 
 
   geos <- tolower(sf::st_geometry_type(lakes))
@@ -93,7 +95,7 @@ gee_get_data_for_years_parallel <- function(
     if(debug) {
       lakename <- lakes[[col_lakename]][idx]
       tfile <- fs::path_join(c(debug_dir,
-                               sprintf("debug_parallel_%02d_%s.txt",
+                               sprintf("debug_parallel_%03d_%s.txt",
                                        idx,
                                        lakename)))
       sink(tfile, append = FALSE)
@@ -114,7 +116,7 @@ gee_get_data_for_years_parallel <- function(
       n_year_splits = n_year_splits)
       )
 
-    if(class(res) == "try-error") {
+    if(any(class(res) == "try-error")) {
       not_failed <- FALSE
     } else {
       not_failed <- TRUE
@@ -123,12 +125,14 @@ gee_get_data_for_years_parallel <- function(
 
     if(debug) sink()
 
+    return_obj <- NULL
 
     if(export_rds && not_failed) {
-      rds_name <- sprintf("%s_%s_%s_%4d-%4d.rds",
+      rds_name <- sprintf("%s_%s_%s_scale-%dm_%4d-%4d.rds",
                           lakes[[col_lakename]][idx],
                           shape_type,
                           spatial_fun,
+                          scale,
                           min(years),
                           max(years))
 
@@ -137,9 +141,15 @@ gee_get_data_for_years_parallel <- function(
       kwb.utils::catAndRun(sprintf("Exporting dataset to '%s'", rds_path),
                            expr = { saveRDS(res, file = rds_path) }
       )
+
+      return_obj <- rds_path
     }
 
-    return(res)
+      if(return_list | !(export_rds && not_failed)) {
+        return_obj <- res
+      }
+
+    return(return_obj)
   }
 
   # Initialize necessary packages and environments on each cluster

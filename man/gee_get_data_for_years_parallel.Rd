@@ -22,7 +22,8 @@ gee_get_data_for_years_parallel(
   export_rds = TRUE,
   export_dir = tempdir(),
   ncores = parallel::detectCores() - 1,
-  n_year_splits = NULL
+  n_year_splits = NULL,
+  return_list = FALSE
 )
 }
 \arguments{
@@ -45,7 +46,8 @@ format: as.list(c("QA60", paste0("B", 1:6)))}
 \item{via}{via (default: "getInfo"), other options use google cloud (google drive
 or google cloud storage)}
 
-\item{col_lakename}{col_lakename (default: "GEWNAME")}
+\item{col_lakename}{col_lakename ("GEWNAME", used by Berlin authority for surface
+water bodies) use "SEE_NAME" for Brandenburg lakes}
 
 \item{set_lakenames_as_list_indices}{should lake names of "col_lakename" be used
 for naming result list? (default: TRUE)}
@@ -56,6 +58,8 @@ for naming result list? (default: TRUE)}
 
 \item{ee_print}{show debug messages for "ee" (default: FALSE)}
 
+\item{export_rds}{save sat data into rds object for each lake (default: TRUE)}
+
 \item{export_dir}{directory where to save data for each lake (default: tempdir())}
 
 \item{ncores}{number of cores for parallel processinfg (default:
@@ -65,10 +69,13 @@ parallel::detectCores() - 1)}
 uses too much images > 400-500 per year (default: NULL, determined automatically within
 function. In case it should be overwritten by the user provide a meaningful integer number)}
 
-\item{export_fst}{save sat data into fst object for each lake?}
+\item{return_list}{should results be provided as R list? (default: FALSE). If FALSE,
+the rds_path to the exported data is provided in case export_rds is set to TRUE}
 }
 \value{
-list with data and metadata, each of them tibbles
+list with data and metadata, each of them tibbles (if return_list = TRUE),
+If FALSE, the rds_path to the exported data is provided in case export_rds is
+set to TRUE. In case an error occurs NULL is returned
 }
 \description{
 Google Earth Engine: get data for years in parallel
