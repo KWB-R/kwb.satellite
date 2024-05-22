@@ -4,12 +4,12 @@
 \alias{create_periods_in_year}
 \title{Helper function: create periods in year}
 \usage{
-create_periods_in_year(year, n_year_splits)
+create_periods_in_year(year, n_periods)
 }
 \arguments{
 \item{year}{year (e.g. 2020)}
 
-\item{n_year_splits}{number of periods to separate the year}
+\item{n_periods}{number of periods into which to separate the year}
 }
 \value{
 data frame with columns "start" and "end"
@@ -18,6 +18,6 @@ data frame with columns "start" and "end"
 Helper function: create periods in year
 }
 \examples{
-create_periods_in_year(2018, 4L)
+create_periods_in_year(2018, n_periods = 4L)
 }
 \keyword{internal}
