@@ -6,18 +6,20 @@
 #' @export
 #' @importFrom reticulate condaenv_exists
 #' @importFrom kwb.python conda_py_install
-create_ad4gd_env <- function(force = FALSE, debug = FALSE) {
+create_ad4gd_env <- function(force = FALSE, debug = FALSE)
+{
+  if (!reticulate::condaenv_exists("ad4gd") || force) {
 
-  if(!reticulate::condaenv_exists("ad4gd") | force) {
-  kwb.python::conda_py_install(env_name = "ad4gd",
-                               pkgs = list(conda = c("python=3.12.2",
-                                                     "numpy"),
-                                           py = "earthengine-api==0.1.370"))
-  } else {
-    if(debug) {
-      message(paste0("Conda environment 'ad4gd' already exists. Use ",
-                             "'force' = TRUE, to reinstall if required"))
-    }
+    kwb.python::conda_py_install(env_name = "ad4gd", pkgs = list(
+      conda = c("python=3.12.2", "numpy"),
+      py = "earthengine-api==0.1.370"
+    ))
+
+  } else if (debug) {
+
+    message(
+      "Conda environment 'ad4gd' already exists. ",
+      "Use 'force' = TRUE to reinstall, if required."
+    )
   }
 }
-

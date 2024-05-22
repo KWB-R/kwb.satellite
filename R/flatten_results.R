@@ -10,25 +10,23 @@
 #' @importFrom dplyr bind_rows
 #' @importFrom tidyr unnest
 #' @importFrom sf st_polygon st_sfc st_set_crs
-flatten_results <- function(sat_data_list,
-                            cols_unnest = "satellite_data_metadata") {
-
-  if(sum(c("satellite_data", "satellite_metadata") %in% cols_unnest) == 2) {
-    names_sep <- "."
-  } else {
-    names_sep <- NULL
-  }
+flatten_results <- function(
+    sat_data_list,
+    cols_unnest = "satellite_data_metadata"
+)
+{
+  cols_satellite <- c("satellite_data", "satellite_metadata")
 
   sat_data_df_nested <- sat_data_list %>%
     dplyr::bind_rows()
 
-
-  lapply(seq_len(nrow(sat_data_df_nested)),
-         function(i) {
-           sat_data_df_nested[i, ] %>%
-             tidyr::unnest(tidyselect::all_of(cols_unnest),
-                           names_sep = names_sep)
-         }) %>%
+  seq_len(nrow(sat_data_df_nested)) %>%
+    lapply(function(i) {
+      tidyr::unnest(
+        sat_data_df_nested[i, ],
+        tidyselect::all_of(cols_unnest),
+        names_sep = if (all(cols_satellite %in% cols_unnest)) "." # else NULL
+      )
+    }) %>%
     dplyr::bind_rows()
-
 }

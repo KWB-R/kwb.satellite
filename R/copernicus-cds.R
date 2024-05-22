@@ -96,19 +96,16 @@ copernicus_cds_parallel <- function(
 )
 {
   ncores <- parallel::detectCores() - 1
-
   cl <- parallel::makeCluster(ncores)
   on.exit(parallel::stopCluster(cl))
 
-  msg <- sprintf(
-    "Importing %d variable(s) (%s) from Copernicus CDS parallel (ncores = %d)",
-    length(variables),
-    kwb.utils::stringList(variables),
-    ncores
-  )
-
   kwb.utils::catAndRun(
-    messageText = msg,
+    messageText = sprintf(
+      "Importing %d variable(s) (%s) from Copernicus CDS parallel (ncores = %d)",
+      length(variables),
+      kwb.utils::stringList(variables),
+      ncores
+    ),
     expr = parallel::parLapply(cl, variables, function(variable) {
       try(copernicus_cds(
         variable,

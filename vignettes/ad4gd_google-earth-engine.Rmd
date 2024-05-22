@@ -23,18 +23,17 @@ is_gh_actions <- identical(Sys.getenv("CI"), "true")
 pkgs_cran <- c("geojsonsf", "rgee", "reticulate")
 pkgs_runiverse <- "kwb.python"
 pkgs <- c(pkgs_cran, pkgs_runiverse)
-install.packages(pkgs, repos = c("https://cloud.r-project.org",
-                                 "https://kwb-r.r-universe.dev"))
 
+install.packages(pkgs, repos = c(
+  "https://cloud.r-project.org",
+  "https://kwb-r.r-universe.dev"
+))
 
 ### Downgrade to last one supplied by R package "rgee"
-kwb.python::conda_py_install("ad4gd", pkgs = list(conda = c("python=3.12.2",
-                                                            "numpy"),
-                                                  py = "earthengine-api==0.1.370"))
-
-
-
-
+kwb.python::conda_py_install("ad4gd", pkgs = list(
+  conda = c("python=3.12.2", "numpy"),
+  py = "earthengine-api==0.1.370"
+))
 ```
 
 ## Use
@@ -47,52 +46,49 @@ kwb.python::conda_py_install("ad4gd", pkgs = list(conda = c("python=3.12.2",
 library(magrittr)
 
 url <- "https://fbinter.stadt-berlin.de/fb/atom/Gewaesserkarte/Gewaesserkarte.zip"
-tfile <- basename(url)
+destfile <- basename(url)
+download.file(url, destfile = destfile)
+unzip(zipfile = destfile, exdir = "lakes_berlin")
 
-download.file(url, destfile = basename(url))
-
-unzip(zipfile = tfile,
-      exdir = "lakes_berlin")
-
-lakes_berlin <- sf::read_sf("lakes_berlin/Gewaesser_Berlin_Flaechen.shp",
-                                  options = "ENCODING=WINDOWS-1252") %>% 
+lakes_berlin <- "lakes_berlin/Gewaesser_Berlin_Flaechen.shp" %>% 
+  sf::read_sf(options = "ENCODING=WINDOWS-1252") %>% 
   dplyr::mutate(area = sf::st_area(.)) %>%
   dplyr::filter(stringr::str_starts(GEWART, pattern = "Stehendes"))
-
-
 ```
 
 #### Lakes Brandenburg
 
 ```{r lakes_brandenburg}
-archive::archive_extract("https://data.geobasis-bb.de/geofachdaten/Wasser/Hydrologie/seen25.zip", 
-                         dir = "lakes_bb")
-lakes_bb <- sf::read_sf("lakes_bb/Seen25_20211105/seen25.shp")
+url <- "https://data.geobasis-bb.de/geofachdaten/Wasser/Hydrologie/seen25.zip"
+archive::archive_extract(url, dir = "lakes_bb")
 
-csv_path <- system.file("extdata/seen25_selected.csv", package = "kwb.satellite")
+lakes_bb <- "lakes_bb/Seen25_20211105/seen25.shp" %>% 
+  sf::read_sf()
+
+lakes_25 <- "extdata/seen25_selected.csv" %>% 
+  system.file(package = "kwb.satellite") %>% 
+  readr::read_csv(col_types = "c")
 
 lakes_bb_selected <- lakes_bb %>%
-  dplyr::inner_join(readr::read_csv(csv_path, col_types = "c"), by = "SEE_KZ")
-
-
+  dplyr::inner_join(lakes_25, by = "SEE_KZ")
 ```
 
 ### Get Satellite Data
 
 #### Single Core
+
 ```{r satellite_data_single, eval = ! is_gh_actions}
-
 plot_solar_azimut_angle <- function(res) {
-
-res %>% 
-ggplot2::ggplot(ggplot2::aes(x = datetime_start,
-                            y = MEAN_SOLAR_AZIMUTH_ANGLE,
-                            col = tile_id)) +
-  ggplot2::geom_point() +
-  ggplot2::geom_line() +
-  ggplot2::theme_bw()
+  res %>% 
+    ggplot2::ggplot(ggplot2::aes(
+      x = datetime_start,
+      y = MEAN_SOLAR_AZIMUTH_ANGLE,
+      col = tile_id
+    )) +
+    ggplot2::geom_point() +
+    ggplot2::geom_line() +
+    ggplot2::theme_bw()
 }
-
 
 reticulate::use_condaenv("ad4gd")
 
@@ -101,31 +97,33 @@ library(rgee)
 rgee::ee_Initialize()
 
 system.time(
-lakes_01_ptonsurface <- kwb.satellite::gee_get_data_for_years(
-  years = 2018,
-  lakes = lakes_berlin[1, ],
-  #bands = NULL,
-  point_on_surface = TRUE)
+  lakes_01_ptonsurface <- kwb.satellite::gee_get_data_for_years(
+    years = 2018,
+    lakes = lakes_berlin[1, ],
+    #bands = NULL,
+    point_on_surface = TRUE
+  )
 )
 
 lakes_01_ptonsurface <- kwb.satellite::flatten_results(lakes_01_ptonsurface)
 plot_solar_azimut_angle(lakes_01_ptonsurface)
 
+selected <- lakes_bb_selected$SEE_NAME == "Senftenberger See"
 
 system.time(
-lakes_malte_test <- kwb.satellite::gee_get_data_for_years(
-  years = 2021:2024,
-  lakes = lakes_bb_selected[lakes_bb_selected$SEE_NAME == "Senftenberger See",],
-  point_on_surface = FALSE,
-  scale = 5,
-  col_lakename = "SEE_NAME",
-  debug = TRUE)
+  lakes_malte_test <- kwb.satellite::gee_get_data_for_years(
+    years = 2021:2024,
+    lakes = lakes_bb_selected[selected, ],
+    point_on_surface = FALSE,
+    scale = 5,
+    col_lakename = "SEE_NAME",
+    debug = TRUE
+  )
 )
 
 lakes_malte_test_flatten <- kwb.satellite::flatten_results(lakes_malte_test)
 
 plot_solar_azimut_angle(lakes_malte_test_flatten)
-
 ```
 
 #### Multi Core
@@ -135,40 +133,43 @@ reticulate::use_condaenv("ad4gd")
 library(rgee)
 rgee::ee_Initialize()
 
-
-csv_path <- system.file("extdata/lakes_bb_malte.csv", package = "kwb.satellite")
-
-lakes_malte <- readr::read_csv(csv_path) %>% 
+lakes_malte <- "extdata/lakes_bb_malte.csv" %>% 
+  system.file(package = "kwb.satellite") %>% 
+  readr::read_csv() %>% 
   sf::st_as_sf(coords = c("long", "lat"),  crs = 4326)
 
 years <- 2017:2023
 #kwb.utils::hsOpenWindowsExplorer(exp_dir)
 
 system.time(
-lakes_malte_centroid <- kwb.satellite::gee_get_data_for_years(
-  years = years,
-  lakes = lakes_malte[2,],
-  point_on_surface = FALSE,
-  col_lakename = "SEE_NAME",
-  debug = TRUE)
+  lakes_malte_centroid <- kwb.satellite::gee_get_data_for_years(
+    years = years,
+    lakes = lakes_malte[2,],
+    point_on_surface = FALSE,
+    col_lakename = "SEE_NAME",
+    debug = TRUE
+  )
 )
 
 exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/malte_point"))
 
 system.time(
-lakes_malte_points_parallel <- kwb.satellite::gee_get_data_for_years_parallel(
-  years = years,
-  lakes = lakes_malte,
-  point_on_surface = FALSE,
-  spatial_fun = "mean",
-  col_lakename = "SEE_NAME",
-  debug_dir = exp_dir, 
-  export_dir = exp_dir,
-  debug = TRUE)
+  lakes_malte_points_parallel <- kwb.satellite::gee_get_data_for_years_parallel(
+    years = years,
+    lakes = lakes_malte,
+    point_on_surface = FALSE,
+    spatial_fun = "mean",
+    col_lakename = "SEE_NAME",
+    debug_dir = exp_dir, 
+    export_dir = exp_dir,
+    debug = TRUE
+  )
 )
 
-saveRDS(lakes_malte_points_parallel,
-        fs::path_join(c(exp_dir, "../malte_point.rds")))
+saveRDS(
+  lakes_malte_points_parallel,
+  fs::path_join(c(exp_dir, "../malte_point.rds"))
+)
 
 lakes_selected <- lakes_bb %>% 
   dplyr::filter(SEE_KZ %in% lakes_malte$SEE_KZ)
@@ -176,111 +177,131 @@ lakes_selected <- lakes_bb %>%
 exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/lakes-bb_point-on-surface"))
 
 system.time(
-lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
-  years = years,
-  lakes = lakes_selected,
-  point_on_surface = TRUE,
-  spatial_fun = "mean",
-  col_lakename = "SEE_NAME",
-  debug_dir = exp_dir, 
-  export_dir = exp_dir,
-  debug = TRUE)
+  lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
+    years = years,
+    lakes = lakes_selected,
+    point_on_surface = TRUE,
+    spatial_fun = "mean",
+    col_lakename = "SEE_NAME",
+    debug_dir = exp_dir, 
+    export_dir = exp_dir,
+    debug = TRUE
+  )
 )
 
-saveRDS(lakes_bb_point_on_surface, fs::path_join(c(exp_dir, "../lakes-bb_point-on-surface.rds")))
+saveRDS(
+  lakes_bb_point_on_surface, 
+  fs::path_join(c(exp_dir, "../lakes-bb_point-on-surface.rds"))
+)
 
 exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/lakes-bb_polygon"))
 
 system.time(
-lakes_bb_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
-  years = years,
-  lakes = lakes_selected,
-  point_on_surface = FALSE,
-  spatial_fun = "mean",
-  col_lakename = "SEE_NAME",
-  debug_dir = exp_dir, 
-  export_dir = exp_dir,
-  debug = TRUE)
+  lakes_bb_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
+    years = years,
+    lakes = lakes_selected,
+    point_on_surface = FALSE,
+    spatial_fun = "mean",
+    col_lakename = "SEE_NAME",
+    debug_dir = exp_dir, 
+    export_dir = exp_dir,
+    debug = TRUE
+  )
 )
-
 
 exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/berlin_point"))
 
 system.time(
-lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
-  years = years,
-  lakes = lakes_selected,
-  point_on_surface = TRUE,
-  spatial_fun = "mean",
-  col_lakename = "SEE_NAME",
-  debug_dir = exp_dir, 
-  export_dir = exp_dir,
-  debug = TRUE)
+  lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
+    years = years,
+    lakes = lakes_selected,
+    point_on_surface = TRUE,
+    spatial_fun = "mean",
+    col_lakename = "SEE_NAME",
+    debug_dir = exp_dir, 
+    export_dir = exp_dir,
+    debug = TRUE
+  )
 )
 
-saveRDS(lakes_berlin_point_on_surface, 
-        fs::path_join(c(exp_dir, "../lakes_berlin_point_on_surface.rds")))
+saveRDS(
+  lakes_berlin_point_on_surface, 
+  fs::path_join(c(exp_dir, "../lakes_berlin_point_on_surface.rds"))
+)
 
 exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/berlin_polygon"))
 
 system.time(
-lakes_bb_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
-  years = years,
-  lakes = lakes_selected,
-  point_on_surface = FALSE,
-  spatial_fun = "mean",
-  col_lakename = "SEE_NAME",
-  debug_dir = exp_dir, 
-  export_dir = exp_dir,
-  debug = TRUE)
+  lakes_bb_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
+    years = years,
+    lakes = lakes_selected,
+    point_on_surface = FALSE,
+    spatial_fun = "mean",
+    col_lakename = "SEE_NAME",
+    debug_dir = exp_dir, 
+    export_dir = exp_dir,
+    debug = TRUE
+  )
 )
 
-saveRDS(lakes_berlin_polygon, 
-        fs::path_join(c(exp_dir, "../lakes_berlin_polygon.rds")))
-
+saveRDS(
+  lakes_berlin_polygon, 
+  fs::path_join(c(exp_dir, "../lakes_berlin_polygon.rds"))
+)
 
 exp_dir <- fs::path_join(c(getwd(), "gee/lakes-bb-selected_point-on-surface"))
 
 fs::dir_create(exp_dir)
 
-lakes_working <- stringr::str_split_fixed(basename(fs::dir_ls(exp_dir, type = "file",regexp = "\\.rds" )),pattern = "_point_on_surface", n = 2)[,1]
+lakes_working <- stringr::str_split_fixed(
+  basename(fs::dir_ls(exp_dir, type = "file", regexp = "\\.rds" )),
+  pattern = "_point_on_surface", 
+  n = 2L
+)[, 1L]
 
-lakes_bb_selected_failed <- lakes_bb_selected[!lakes_bb_selected$SEE_NAME %in% lakes_working,]
+selected <- !lakes_bb_selected$SEE_NAME %in% lakes_working
+lakes_bb_selected_failed <- lakes_bb_selected[selected, ]
 
-lakes_bb_selected_failed <- lakes_bb_selected[lakes_bb_selected$SEE_NAME %in% c("Netzowsee", "Petznicksee"),]
+selected <- lakes_bb_selected$SEE_NAME %in% c("Netzowsee", "Petznicksee")
+lakes_bb_selected_failed <- lakes_bb_selected[selected, ]
 
 system.time(
-lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
-  years = 2024,
-  lakes = lakes_bb_selected[1:7,],
-  point_on_surface = TRUE,
-  spatial_fun = "mean",
-  col_lakename = "SEE_NAME",
-  debug_dir = exp_dir, 
-  export_dir = exp_dir,
-  debug = TRUE)
+  lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
+    years = 2024,
+    lakes = lakes_bb_selected[1:7,],
+    point_on_surface = TRUE,
+    spatial_fun = "mean",
+    col_lakename = "SEE_NAME",
+    debug_dir = exp_dir, 
+    export_dir = exp_dir,
+    debug = TRUE
+  )
 )
 
-saveRDS(lakes_bb_point_on_surface, fs::path_join(c(exp_dir, "../lakes_bb_point_on_surface.rds")))
-
+saveRDS(
+  lakes_bb_point_on_surface, 
+  fs::path_join(c(exp_dir, "../lakes_bb_point_on_surface.rds"))
+)
 
 exp_dir <- fs::path_join(c(getwd(), "gee/lakes_bb_selected_polygon"))
-                           
+
 system.time(
-lakes_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
-  years = years,
-  lakes = lakes_bb_selected,
-  point_on_surface = FALSE,
-  spatial_fun = "mean",
-  col_lakename = "SEE_NAME",
-  debug_dir = exp_dir, 
-  export_dir = exp_dir,
-  debug = TRUE)
+  lakes_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
+    years = years,
+    lakes = lakes_bb_selected,
+    point_on_surface = FALSE,
+    spatial_fun = "mean",
+    col_lakename = "SEE_NAME",
+    debug_dir = exp_dir, 
+    export_dir = exp_dir,
+    debug = TRUE
+  )
 )
 
-saveRDS(lakes_bb_selected_polygon, fs::path_join(c(exp_dir, "../lakes_bb_selected_polygon.rds")))
-
-
+saveRDS(
+  lakes_bb_selected_polygon, 
+  file = fs::path_join(c(exp_dir, "../lakes_bb_selected_polygon.rds"))
+)
 ```
 
 ## Info 
@@ -294,15 +315,11 @@ sessioninfo::session_info() %>%
 
 ### Python Info
 
-
 ```{r reticulate_01, echo = TRUE}
 env_yml <- kwb.python::conda_export("ad4gd", export_dir = ".")
 
 paste0(readLines(env_yml), collapse = "\n") %>% 
   details::details(open = TRUE)
-
-
-
 ```
 
 You can download the python environment used for this tutorial here:

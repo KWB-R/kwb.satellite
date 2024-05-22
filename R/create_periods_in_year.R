@@ -11,25 +11,26 @@
 create_periods_in_year <- function(year, n_periods = 4L)
 {
   stopifnot(length(n_periods) == 1L, n_periods > 0L)
+  stopifnot(is.numeric(year), length(year) == 1L)
 
-  as_date <- function(x) as.Date(sprintf("%04d-%s", as.integer(year), x))
+  year <- as.integer(year)
 
+  as_date <- function(x) as.Date(sprintf("%04d-%s", year, x))
   n_dates <- n_periods + 1L
-  current_date <- Sys.Date()
 
-  end_date <-  if(as.integer(year) != as.integer(format(Sys.Date(), format = "%Y"))) {
-     "12-31"
-  } else {
-    format(current_date, format = "%m-%d")
-  }
+  today <- Sys.Date()
 
-  dates <- seq.Date(as_date("01-01"), as_date(end_date), length.out = n_dates)
+  dates <- seq.Date(
+    from = as_date("01-01"),
+    to = ifelse(is_this_year(year), today, as_date("12-31")),
+    length.out = n_dates
+  )
 
   starts <- dates[-n_dates]
+  ends <- kwb.utils::startsToEnds(starts, lastStop = dates[n_dates])
 
   data.frame(
     start = as.character(starts),
-    end = as.character(kwb.utils::startsToEnds(starts, lastStop = dates[n_dates]))
+    end = as.character(ends)
   )
-
 }
