@@ -15,7 +15,15 @@ create_periods_in_year <- function(year, n_periods = 4L)
   as_date <- function(x) as.Date(sprintf("%04d-%s", as.integer(year), x))
 
   n_dates <- n_periods + 1L
-  dates <- seq.Date(as_date("01-01"), as_date("12-31"), length.out = n_dates)
+  current_date <- Sys.Date()
+
+  end_date <-  if(as.integer(year) != as.integer(format(Sys.Date(), format = "%Y"))) {
+     "12-31"
+  } else {
+    format(current_date, format = "%m-%d")
+  }
+
+  dates <- seq.Date(as_date("01-01"), as_date(end_date), length.out = n_dates)
 
   starts <- dates[-n_dates]
 
@@ -23,4 +31,5 @@ create_periods_in_year <- function(year, n_periods = 4L)
     start = starts,
     end = kwb.utils::startsToEnds(starts, lastStop = dates[n_dates])
   )
+
 }
