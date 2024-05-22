@@ -49,7 +49,7 @@ gee_get_data_for_years <- function(
 
   lakes_obj <- deparse(substitute(lakes))
 
-  if (! "sf" %in% class(lakes))  {
+  if (!inherits(lakes, "sf"))  {
     message(sprintf("Converting object 'lakes' = '%s'", lakes_obj))
     lakes <- sf::st_as_sf(lakes)
   }
@@ -211,7 +211,7 @@ gee_get_data <- function (
 
   lakes_obj <- deparse(substitute(lakes))
 
-  if (! "sf" %in% class(lakes)) {
+  if (!inherits(lakes, "sf")) {
     message(sprintf("Converting object 'lakes' = '%s'", lakes_obj))
     lakes <- sf::st_as_sf(lakes)
   }
