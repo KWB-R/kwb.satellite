@@ -77,7 +77,10 @@ lakes_bb_selected <- lakes_bb %>%
 
 shp_path <- system.file("extdata/brandenburger_see_collection/seen25_wgs84_selection_centroid3.shp", package = "kwb.satellite")
 
-lakes_bb_selected_points <- sf::read_sf(shp_path)
+lakes_bb_selected_points <- sf::read_sf(shp_path) %>% 
+  dplyr::inner_join(lakes_bb_selected[, c("SEE_KZ", "JP_ID")] %>% 
+                      dplyr::rename(geometry_polygon = geometry) %>% 
+                      tibble::as_tibble() , by = "JP_ID")
 
 
 ```

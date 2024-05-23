@@ -104,13 +104,13 @@ gee_get_data_for_years_parallel <- function(
       ""
     }
 
-    lake_id <- if(!is.null(lake_name)) {
+    lake_id <- if(!is.null(lakes[[col_lakeid]][idx])) {
       paste0(lakes[[col_lakeid]][idx], "_")
     } else {
       ""
     }
 
-    filename <- sprintf("%s%s_%s%s_%s_scale-%dm_%4d-%4d",
+    filename <- sprintf("%s%s_%s_%s_%s_scale-%dm_%4d-%4d",
                         lake_idx,
                         lake_name,
                         lake_id,
