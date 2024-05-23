@@ -95,12 +95,35 @@ gee_get_data_for_years_parallel <- function(
   on.exit(parallel::stopCluster(cl))
 
   my_fun <- function(idx) {
+
+    lake_name <- lakes[[col_lakename]][idx]
+
+    lake_idx <- if(is.null(lake_name)) {
+      sprintf(paste0("%0", nchar(nrow(lakes_bb_selected)), "d_"), idx)
+    } else {
+      ""
+    }
+
+    lake_id <- if(!is.null(lake_name)) {
+      paste0(lakes[[col_lakeid]][idx], "_")
+    } else {
+      ""
+    }
+
+    filename <- sprintf("%s%s_%s%s_%s_scale-%dm_%4d-%4d",
+                        lake_idx,
+                        lake_name,
+                        lake_id,
+                        shape_type,
+                        spatial_fun,
+                        scale,
+                        min(years),
+                        max(years))
+
     if(debug) {
-      lakename <- lakes[[col_lakename]][idx]
+
       tfile <- fs::path_join(c(debug_dir,
-                               sprintf("debug_parallel_%03d_%s.txt",
-                                       idx,
-                                       lakename)))
+                               sprintf("%s.txt", filename)))
       sink(tfile, append = FALSE)
     }
 
@@ -131,28 +154,8 @@ gee_get_data_for_years_parallel <- function(
     return_obj <- NULL
 
 
-    lake_idx <- if(is.null(lakes[[col_lakeid]][idx])) {
-      sprintf(paste0("%0", nchar(nrow(lakes_bb_selected)), "d_"), idx)
-    } else {
-      ""
-    }
-
-    lake_id <- if(!is.null(lakes[[col_lakeid]][idx])) {
-      paste0(lakes[[col_lakeid]][idx], "_")
-    } else {
-      ""
-    }
-
     if(export_rds && not_failed) {
-      rds_name <- sprintf("%s%s_%s%s_%s_scale-%dm_%4d-%4d.rds",
-                          lake_idx,
-                          lakes[[col_lakename]][idx],
-                          lake_id,
-                          shape_type,
-                          spatial_fun,
-                          scale,
-                          min(years),
-                          max(years))
+      rds_name <- sprintf("%s.rds", filename)
 
       rds_path <- fs::path_join(c(export_dir, rds_name))
 
