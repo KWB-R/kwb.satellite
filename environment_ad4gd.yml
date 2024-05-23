@@ -39,7 +39,7 @@ dependencies:
       - charset-normalizer==3.3.2
       - earthengine-api==0.1.370
       - google-api-core==2.19.0
-      - google-api-python-client==2.129.0
+      - google-api-python-client==2.130.0
       - google-auth==2.29.0
       - google-auth-httplib2==0.2.0
       - google-cloud-core==2.4.1
