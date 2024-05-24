@@ -5,13 +5,21 @@
 \title{Flatten Results: simplify satellite data and metadata structure by unnesting
 from list to tibble}
 \usage{
-flatten_results(sat_data_list, cols_unnest = "satellite_data_metadata")
+flatten_results(
+  sat_data_list,
+  cols_unnest = "satellite_data_metadata",
+  drop_cols = TRUE
+)
 }
 \arguments{
 \item{sat_data_list}{satellite data list result as retrieved by for example
 \code{\link{gee_get_data_for_years_parallel}}}
 
 \item{cols_unnest}{vector with names of columns to unnest (default: "satellite_data_metadata")}
+
+\item{drop_cols}{should columns not used for unnesting be dropped (refers to
+the columns: "satellite_data_metadata", "satellite_data", "satellite_metadata"),
+default: TRUE}
 }
 \value{
 tibble with column names satellite_data.xxx and satellite_metadata.xxx

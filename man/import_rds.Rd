@@ -4,13 +4,31 @@
 \alias{import_rds}
 \title{Helper function: import .rds files from folder}
 \usage{
-import_rds(rds_dir)
+import_rds(
+  rds_dir,
+  flatten = TRUE,
+  cols_unnest = "satellite_data_metadata",
+  drop_cols = TRUE,
+  debug = TRUE
+)
 }
 \arguments{
 \item{rds_dir}{path to directoy containing .rds files}
+
+\item{flatten}{should imported results be flattened (default: TRUE)}
+
+\item{cols_unnest}{vector with names of columns to unnest (default:
+"satellite_data_metadata"), only used if flatten == TRUE}
+
+\item{drop_cols}{should columns not used for unnesting be dropped (refers to
+the columns: "satellite_data_metadata", "satellite_data", "satellite_metadata"),
+default: TRUE}
+
+\item{debug}{print debug messages? (default: TRUE)}
 }
 \value{
-list with imported
+list of imported .rds file or flattened (if flatten == TRUE) with
+tibble with column names satellite_data.xxx and satellite_metadata.xxx
 }
 \description{
 Helper function: import .rds files from folder
