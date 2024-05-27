@@ -110,7 +110,7 @@ gee_get_data_for_years_parallel <- function(
       ""
     }
 
-    filename <- sprintf("%s%s_%s_%s_%s_scale-%dm_%4d-%4d",
+    filename <- sprintf("%s%s_%s%s_%s_scale-%dm_%4d-%4d",
                         lake_idx,
                         lake_name,
                         lake_id,
