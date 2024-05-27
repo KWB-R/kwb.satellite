@@ -5,7 +5,7 @@ channels:
 dependencies:
   - bzip2=1.0.8=hcfcfb64_5
   - ca-certificates=2024.2.2=h56e8100_0
-  - intel-openmp=2024.1.0=h57928b3_965
+  - intel-openmp=2024.1.0=h57928b3_966
   - libblas=3.9.0=22_win64_mkl
   - libcblas=3.9.0=22_win64_mkl
   - libexpat=2.6.2=h63175ca_0
@@ -18,7 +18,7 @@ dependencies:
   - libzlib=1.2.13=hcfcfb64_5
   - mkl=2024.1.0=h66d3029_692
   - numpy=1.26.4=py312h8753938_0
-  - openssl=3.3.0=h2466b09_2
+  - openssl=3.3.0=h2466b09_3
   - pip=24.0=pyhd8ed1ab_0
   - pthreads-win32=2.9.1=hfa6e2cd_3
   - python=3.12.2=h2628c8c_0_cpython

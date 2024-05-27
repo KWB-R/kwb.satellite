@@ -59,7 +59,13 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">import_rds</span><span class="op">(</span><span class="va">rds_dir</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">import_rds</span><span class="op">(</span></span>
+<span>  <span class="va">rds_dir</span>,</span>
+<span>  flatten <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  cols_unnest <span class="op">=</span> <span class="st">"satellite_data_metadata"</span>,</span>
+<span>  drop_cols <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  debug <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -67,12 +73,32 @@
     <dl><dt>rds_dir</dt>
 <dd><p>path to directoy containing .rds files</p></dd>
 
+
+<dt>flatten</dt>
+<dd><p>should imported results be flattened (default: TRUE)</p></dd>
+
+
+<dt>cols_unnest</dt>
+<dd><p>vector with names of columns to unnest (default:
+"satellite_data_metadata"), only used if flatten == TRUE</p></dd>
+
+
+<dt>drop_cols</dt>
+<dd><p>should columns not used for unnesting be dropped (refers to
+the columns: "satellite_data_metadata", "satellite_data", "satellite_metadata"),
+default: TRUE</p></dd>
+
+
+<dt>debug</dt>
+<dd><p>print debug messages? (default: TRUE)</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>list with imported</p>
+<p>list of imported .rds file or flattened (if flatten == TRUE) with
+tibble with column names satellite_data.xxx and satellite_metadata.xxx</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
