@@ -9,6 +9,8 @@ import_rds(
   flatten = TRUE,
   cols_unnest = "satellite_data_metadata",
   drop_cols = TRUE,
+  run_parallel = TRUE,
+  n_cores = parallel::detectCores() - 1L,
   debug = TRUE
 )
 }
@@ -23,6 +25,12 @@ import_rds(
 \item{drop_cols}{should columns not used for unnesting be dropped (refers to
 the columns: "satellite_data_metadata", "satellite_data", "satellite_metadata"),
 default: TRUE}
+
+\item{run_parallel}{should multiple cores (if available) be used for import?
+(default: TRUE)}
+
+\item{n_cores}{number of cores to use if \code{run_parallel = TRUE}.
+Default: one less than the detected number of cores.}
 
 \item{debug}{print debug messages? (default: TRUE)}
 }

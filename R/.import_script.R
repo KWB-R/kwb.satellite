@@ -1,10 +1,10 @@
 data_dirs <- fs::dir_ls("vignettes/gee/current")
 
-data <- stats::setNames(lapply(data_dirs, function(dir) {
+data <- stats::setNames(lapply(data_dirs[3], function(dir) {
   kwb.satellite::import_rds(rds_dir = dir, flatten = TRUE) #%>%
     #dplyr::bind_rows()
     }),
-                nm = basename(data_dirs))
+                nm = basename(data_dirs[3]))
 
 length(tmp_list)
 
