@@ -64,6 +64,8 @@
 <span>  flatten <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  cols_unnest <span class="op">=</span> <span class="st">"satellite_data_metadata"</span>,</span>
 <span>  drop_cols <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  run_parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  n_cores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1L</span>,</span>
 <span>  debug <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -87,6 +89,16 @@
 <dd><p>should columns not used for unnesting be dropped (refers to
 the columns: "satellite_data_metadata", "satellite_data", "satellite_metadata"),
 default: TRUE</p></dd>
+
+
+<dt>run_parallel</dt>
+<dd><p>should multiple cores (if available) be used for import?
+(default: TRUE)</p></dd>
+
+
+<dt>n_cores</dt>
+<dd><p>number of cores to use if <code>run_parallel = TRUE</code>.
+Default: one less than the detected number of cores.</p></dd>
 
 
 <dt>debug</dt>

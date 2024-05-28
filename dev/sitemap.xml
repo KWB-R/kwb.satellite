@@ -67,7 +67,13 @@
     <loc>/dev/reference/index.html</loc>
   </url>
   <url>
+    <loc>/dev/reference/openeo_get_data.html</loc>
+  </url>
+  <url>
     <loc>/dev/reference/pipe.html</loc>
+  </url>
+  <url>
+    <loc>/dev/reference/sf_to_geojson.html</loc>
   </url>
   <url>
     <loc>/dev/reference/split_year.html</loc>
