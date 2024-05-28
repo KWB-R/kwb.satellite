@@ -1,3 +1,20 @@
+#' OpenEO Helper function: get bands metadata
+#'
+#' @param collection_id collection id
+#'
+#' @return tibble with bands metadata
+#' @export
+#' @importFrom openeo describe_collection
+#' @examples
+#' \dontrun{
+#' openeo_get_bands_meta(collection_id = "SENTINEL2_L2A")
+#' }
+#'
+openeo_get_bands_meta <- function(collection_id) {
+  suppressMessages(collection_details <- openeo::describe_collection(collection = collection_id))
+  tibble::as_tibble(collection_details$summaries$`eo:bands`)
+}
+
 #' OpenEO: get data
 #'
 #' @param lakes sf object with lake(s) to get data for
@@ -16,7 +33,8 @@
 #' @param col_lakeid ("GEWRNEU", used by Berlin authority for surface
 #' water bodies) use "SEE_KZ" for Brandenburg lakes (default: "SEE_KZ")
 #' @param start_job should job be started (default: FALSE)
-#' @return job object with job id for processing results data or starting job afterwards
+#' @return list with job object with job id for processing results data or starting
+#' job afterwards and metadata for selected bands
 #' @importFrom openeo processes list_collections list_file_formats create_job
 #' start_job
 #' @export
@@ -40,8 +58,17 @@ openeo_get_data <- function(lakes,
                             start_job = FALSE
                             ) {
 
+
 p <- openeo::processes()
 colls <- openeo::list_collections()
+
+bands_meta_tibble <- openeo_get_bands_meta(collection_id)
+
+if(!is.null(bands)) {
+  stopifnot(all(bands %in% bands_meta_tibble$name))
+  bands_meta_tibble <- bands_meta_tibble %>% dplyr::filter(name %in% bands)
+}
+
 formats <- openeo::list_file_formats()
 
 stopifnot(collection_id %in% names(colls))
@@ -123,7 +150,8 @@ job <- openeo::create_job(graph = res, title = batch_name)
 
 if(start_job) openeo::start_job(job$id)
 
-job
+list(job = job,
+     metadata_bands = bands_meta_tibble)
 }
 
 
