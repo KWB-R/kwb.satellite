@@ -52,7 +52,7 @@ openeo_get_data <- function(lakes,
                             point_on_surface = FALSE,
                             spatial_fun = "mean",
                             bands = NULL,
-                            output_format = "JSON",
+                            output_format = "CSV",
                             col_lakename = "SEE_NAME",
                             col_lakeid = "SEE_KZ",
                             start_job = FALSE
@@ -87,7 +87,7 @@ shape_type <- if(all(geos == "point")) {
   "unclear"
 }
 
-if(is.null(spatial_fun) & output_format != "netCDF") {
+if(is.null(spatial_fun) && output_format != "netCDF") {
   message("Setting 'output_format' to 'netCDF, because '%s' is not supported by OpenEO",
           output_format)
   output_format <- "netCDF"
@@ -101,16 +101,6 @@ lake_id <- if(!is.null(lakes[[col_lakeid]])) {
 } else {
   ""
 }
-
-batch_name <- sprintf("%s_%s%s_%s_%s-%s_%s",
-                    lake_name,
-                    lake_id,
-                    shape_type,
-                    spatial_fun,
-                    date_start,
-                    date_end,
-                    output_format) %>% paste0(collapse = "_")
-
 
 lakes <- if(point_on_surface) {
   lakes %>%
@@ -144,6 +134,16 @@ cube <- p$aggregate_spatial(data = cube,
 
 # save result as JSON
 res <- p$save_result(data = cube, format = output_format)
+
+batch_name <- sprintf("%s_%s%s_%s_%s_%s-%s_%s",
+                      lake_name,
+                      lake_id,
+                      shape_type,
+                      collection_id,
+                      if(is.null(spatial_fun)) {"raw"} else {spatial_fun},
+                      date_start,
+                      date_end,
+                      output_format) %>% paste0(collapse = "_")
 
 # send job to back-end
 job <- openeo::create_job(graph = res, title = batch_name)
