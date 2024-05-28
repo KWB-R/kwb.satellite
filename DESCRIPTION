@@ -38,6 +38,7 @@ Imports:
     kwb.utils,
     magrittr,
     parallel,
+    openeo,
     rgee,
     rlang,
     sf,
