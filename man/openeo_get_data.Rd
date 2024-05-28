@@ -12,7 +12,7 @@ openeo_get_data(
   point_on_surface = FALSE,
   spatial_fun = "mean",
   bands = NULL,
-  output_format = "JSON",
+  output_format = "CSV",
   col_lakename = "SEE_NAME",
   col_lakeid = "SEE_KZ",
   start_job = FALSE
@@ -47,7 +47,8 @@ water bodies) use "SEE_KZ" for Brandenburg lakes (default: "SEE_KZ")}
 \item{start_job}{should job be started (default: FALSE)}
 }
 \value{
-job object with job id for processing results data or starting job afterwards
+list with job object with job id for processing results data or starting
+job afterwards and metadata for selected bands
 }
 \description{
 OpenEO: get data
