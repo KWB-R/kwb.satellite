@@ -73,6 +73,9 @@
     <loc>/dev/reference/index.html</loc>
   </url>
   <url>
+    <loc>/dev/reference/openeo_download_results.html</loc>
+  </url>
+  <url>
     <loc>/dev/reference/openeo_get_bands_meta.html</loc>
   </url>
   <url>
