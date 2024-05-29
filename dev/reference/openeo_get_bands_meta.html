@@ -59,13 +59,19 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">openeo_get_bands_meta</span><span class="op">(</span><span class="va">collection_id</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">openeo_get_bands_meta</span><span class="op">(</span><span class="va">collection_id</span>, simplfy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>collection_id</dt>
 <dd><p>collection id</p></dd>
+
+
+<dt>simplify</dt>
+<dd><p>if TRUE aliases column will be collapsed so that multiple aliases
+were joined with '/' and resulting tibble contains no sublists anymore
+(default: TRUE)</p></dd>
 
 </dl></div>
     <div class="section level2">

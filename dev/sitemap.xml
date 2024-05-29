@@ -82,6 +82,9 @@
     <loc>/dev/reference/openeo_get_data.html</loc>
   </url>
   <url>
+    <loc>/dev/reference/openeo_get_job_metadata.html</loc>
+  </url>
+  <url>
     <loc>/dev/reference/openeo_start_max_jobs.html</loc>
   </url>
   <url>
