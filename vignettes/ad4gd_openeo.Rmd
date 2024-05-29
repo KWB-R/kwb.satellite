@@ -1,0 +1,123 @@
+---
+title: "AD4DG: OpenEO"
+author: "Michael Rustler"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{AD4DG: OpenEO}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+is_gh_actions <- identical(Sys.getenv("CI"), "true")
+```
+
+## Use
+
+### Get Lakes 
+
+#### Lakes Berlin
+
+```{r lakes_berlin}
+library(magrittr)
+
+url <- "https://fbinter.stadt-berlin.de/fb/atom/Gewaesserkarte/Gewaesserkarte.zip"
+tfile <- basename(url)
+
+download.file(url, destfile = basename(url))
+
+unzip(zipfile = tfile,
+      exdir = "lakes_berlin")
+
+lakes_berlin <- sf::read_sf("lakes_berlin/Gewaesser_Berlin_Flaechen.shp",
+                                  options = "ENCODING=WINDOWS-1252") %>% 
+  dplyr::mutate(area = sf::st_area(.)) %>%
+  dplyr::filter(stringr::str_starts(GEWART, pattern = "Stehendes"))
+
+
+```
+
+#### Lakes Brandenburg
+
+```{r lakes_brandenburg}
+archive::archive_extract("https://data.geobasis-bb.de/geofachdaten/Wasser/Hydrologie/seen25.zip", 
+                         dir = "lakes_bb")
+lakes_bb <- sf::read_sf("lakes_bb/Seen25_20211105/seen25.shp")
+
+csv_path <- system.file("extdata/seen25_selected.csv", package = "kwb.satellite")
+
+lakes_bb_selected <- lakes_bb %>%
+  dplyr::inner_join(readr::read_csv(csv_path, col_types = "c"), by = "SEE_KZ")
+
+
+shp_path <- system.file("extdata/brandenburger_see_collection/seen25_wgs84_selection_centroid3.shp", package = "kwb.satellite")
+
+lakes_bb_selected_points <- sf::read_sf(shp_path) %>% 
+  dplyr::inner_join(lakes_bb_selected[, c("SEE_KZ", "JP_ID")] %>% 
+                      dplyr::rename(geometry_polygon = geometry) %>% 
+                      tibble::as_tibble() , by = "JP_ID")
+
+
+```
+
+### Get Satellite Data
+
+```{r satellite_data, eval = FALSE}
+openeo_con <- openeo::connect(host = "https://openeo.dataspace.copernicus.eu")
+openeo::login(openeo_con)
+
+collection_id <- "SENTINEL2_L2A"
+
+lakes_bb_selected_polygon <- lapply(seq_len(nrow(lakes_bb_selected)), function(i) {
+  kwb.satellite::openeo_get_data(lakes = lakes_bb_selected[i,],
+                                 collection_id = collection_id)
+  })
+
+job_ids <- sapply(seq_len(nrow(lakes_bb_selected)),
+                  function(i) lakes_bb_selected_polygon[[i]]$job$id)
+
+kwb.satellite::openeo_start_max_jobs(job_ids = job_ids)
+
+jobs_finished <- tibble::as_tibble(openeo::list_jobs()) %>%
+  dplyr::filter(status == "finished") %>%
+  dplyr::arrange(dplyr::desc(updated))
+
+nrow(jobs_finished)
+
+jobs_meta <- lapply(jobs_finished$id, kwb.satellite::openeo_get_job_metadata) %>%
+  dplyr::bind_rows()
+
+tdir <- fs::path_abs("./vignettes/openeo/lakes_bb_selected_polygon/")
+fs::dir_create(tdir)
+
+jobs_results <- lapply(jobs_finished$id, function(id) {
+                       kwb.satellite::openeo_download_results(job_id = id,
+                                                              tdir = tdir)
+  })
+
+
+metadata_bands <- kwb.satellite::openeo_get_bands_meta(collection_id)
+
+
+readr::write_csv(metadata_bands,
+                 file = file.path(fs::path_abs("./vignettes/openeo/"),
+                               sprintf("%s_metadata_bands.csv",
+                                       collection_id)))
+
+
+```
+
+## Info 
+
+### Session Info
+
+```{r session-info}
+sessioninfo::session_info() %>%
+  details::details(open = TRUE)
+```
+
