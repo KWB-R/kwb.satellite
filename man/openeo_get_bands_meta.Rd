@@ -4,7 +4,7 @@
 \alias{openeo_get_bands_meta}
 \title{OpenEO Helper function: get bands metadata}
 \usage{
-openeo_get_bands_meta(collection_id, simplfy = TRUE)
+openeo_get_bands_meta(collection_id, simplify = TRUE)
 }
 \arguments{
 \item{collection_id}{collection id}

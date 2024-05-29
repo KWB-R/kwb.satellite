@@ -92,6 +92,14 @@ nrow(jobs_finished)
 jobs_meta <- lapply(jobs_finished$id, kwb.satellite::openeo_get_job_metadata) %>%
   dplyr::bind_rows()
 
+### estimate execution time in days
+n_lakes <- nrow(lakes_bb_selected)
+n_jobs_parallel <- 2
+mean(jobs_meta$usage.duration.value)*n_lakes/n_jobs_parallel/(3600*24)
+
+### estimate execution cost credits
+sum(jobs_meta$costs)*n_lakes/nrow(jobs_meta)
+
 tdir <- fs::path_abs("./vignettes/openeo/lakes_bb_selected_polygon/")
 fs::dir_create(tdir)
 
