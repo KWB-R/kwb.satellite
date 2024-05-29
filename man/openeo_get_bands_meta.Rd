@@ -4,10 +4,14 @@
 \alias{openeo_get_bands_meta}
 \title{OpenEO Helper function: get bands metadata}
 \usage{
-openeo_get_bands_meta(collection_id)
+openeo_get_bands_meta(collection_id, simplfy = TRUE)
 }
 \arguments{
 \item{collection_id}{collection id}
+
+\item{simplify}{if TRUE aliases column will be collapsed so that multiple aliases
+were joined with '/' and resulting tibble contains no sublists anymore
+(default: TRUE)}
 }
 \value{
 tibble with bands metadata

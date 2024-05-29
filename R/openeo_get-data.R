@@ -1,7 +1,9 @@
 #' OpenEO Helper function: get bands metadata
 #'
 #' @param collection_id collection id
-#'
+#' @param simplify if TRUE aliases column will be collapsed so that multiple aliases
+#' were joined with '/' and resulting tibble contains no sublists anymore
+#' (default: TRUE)
 #' @return tibble with bands metadata
 #' @export
 #' @importFrom openeo describe_collection
@@ -10,9 +12,31 @@
 #' openeo_get_bands_meta(collection_id = "SENTINEL2_L2A")
 #' }
 #'
-openeo_get_bands_meta <- function(collection_id) {
+openeo_get_bands_meta <- function(collection_id, simplify = TRUE) {
+  coll <- openeo::list_collections()
+
+  if(!collection_id %in% names(colls)) {
+    stop(sprintf(paste0("Provided collection_id '%s' is not available.\nPlease",
+    " select one of the following:\n\n%s"),
+    collection_id,
+    paste0(names(colls),collapse = "\n")))
+  }
+
   suppressMessages(collection_details <- openeo::describe_collection(collection = collection_id))
-  tibble::as_tibble(collection_details$summaries$`eo:bands`)
+  meta <- tibble::as_tibble(collection_details$summaries$`eo:bands`)
+
+  if(simplify) {
+  aliases <- tibble::tibble(aliases = sapply(seq_len(nrow(meta)), function(i) {
+  paste0(unlist(meta$aliases[[i]]), collapse = "/")
+    }))
+
+  meta <- meta %>%
+    dplyr::select(- aliases) %>%
+    dplyr::bind_cols(aliases) %>%
+    dplyr::relocate(aliases, .before = "center_wavelength")
+  }
+
+  meta
 }
 
 #' OpenEO: get data
