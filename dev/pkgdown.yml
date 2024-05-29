@@ -3,7 +3,8 @@ pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
   ad4gd_google-earth-engine: ad4gd_google-earth-engine.html
+  ad4gd_openeo: ad4gd_openeo.html
   copernicus-cds: copernicus-cds.html
   google-earth-engine: google-earth-engine.html
-last_built: 2024-05-29T09:30Z
+last_built: 2024-05-29T10:20Z
 
