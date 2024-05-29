@@ -39,6 +39,7 @@ Imports:
     magrittr,
     parallel,
     openeo,
+    readr,
     rgee,
     rlang,
     sf,

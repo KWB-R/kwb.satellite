@@ -1,10 +1,27 @@
 openeo_con <- openeo::connect(host = "https://openeo.dataspace.copernicus.eu")
 openeo::login(openeo_con)
 
-test <- lapply(6:10, function(i) {
+lakes_bb_selected_polygon <- lapply(seq_len(nrow(lakes_bb_selected)), function(i) {
   kwb.satellite::openeo_get_data(lakes = lakes_bb_selected[i,])
   })
 
-job_ids <- sapply(1:5, function(i) test[[i]]$job$id)
+job_ids <- sapply(seq_len(nrow(lakes_bb_selected)),
+                  function(i) lakes_bb_selected_polygon [[i]]$job$id)
 
 kwb.satellite::openeo_start_max_jobs(job_ids = job_ids)
+
+jobs_finished <- tibble::as_tibble(openeo::list_jobs()) %>%
+  dplyr::filter(status == "finished") %>%
+  dplyr::arrange(dplyr::desc(updated))
+
+nrow(jobs_finished)
+
+jobs_meta <- lapply(jobs_finished$id, kwb.satellite::openeo_get_job_metadata) %>%
+  dplyr::bind_rows()
+
+tdir <- fs::path_abs("./vignettes/openeo/lakes_bb_selected_polygon/")
+fs::dir_create(tdir)
+
+jobs_results <- lapply(jobs_finished$id,
+                       kwb.satellite::openeo_download_results(tdir = tdir))
+
