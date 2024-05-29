@@ -13,9 +13,9 @@ kwb.utils::catAndRun(sprintf("Getting job metadata for job id '%s'",
                              job_id),
                      expr = {
 job_info <- openeo::describe_job(job_id)
-cols <- which(names(job_info1) != "process")
+cols <- which(names(job_info) != "process")
 
-tibble::as_tibble(t(unlist(job_info1[cols])))
+tibble::as_tibble(t(unlist(job_info[cols])))
 },
 dbg = debug)
 }
