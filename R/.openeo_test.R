@@ -9,7 +9,7 @@ lakes_bb_selected_polygon <- lapply(seq_len(nrow(lakes_bb_selected)), function(i
   })
 
 job_ids <- sapply(seq_len(nrow(lakes_bb_selected)),
-                  function(i) lakes_bb_selected_polygon [[i]]$job$id)
+                  function(i) lakes_bb_selected_polygon[[i]]$job$id)
 
 kwb.satellite::openeo_start_max_jobs(job_ids = job_ids)
 
@@ -35,6 +35,6 @@ metadata_bands <- kwb.satellite::openeo_get_bands_meta(collection_id)
 
 
 readr::write_csv(metadata_bands,
-                 file = paste0(fs::path_abs("./vignettes/openeo/"),
+                 file = file.path(fs::path_abs("./vignettes/openeo/"),
                                sprintf("%s_metadata_bands.csv",
                                        collection_id)))
