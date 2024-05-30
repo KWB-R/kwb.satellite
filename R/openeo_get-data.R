@@ -13,7 +13,7 @@
 #' }
 #'
 openeo_get_bands_meta <- function(collection_id, simplify = TRUE) {
-  coll <- openeo::list_collections()
+  colls <- openeo::list_collections()
 
   if(!collection_id %in% names(colls)) {
     stop(sprintf(paste0("Provided collection_id '%s' is not available.\nPlease",
