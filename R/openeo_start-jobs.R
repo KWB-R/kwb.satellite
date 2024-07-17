@@ -46,7 +46,7 @@ openeo_start_max_jobs <- function(job_ids, max_jobs = 2, check_interval = 30, de
       idx <- idx + 1
       job_status <- check_job_status(job_id = job_ids[idx])
 
-      if(job_status == "created") {
+      if(job_status %in% c("created", "error")) {
       kwb.utils::catAndRun(messageText = sprintf("Start job '%s' (%d/%d), active jobs: %d",
                                                  job_ids[idx],
                                                  idx,
