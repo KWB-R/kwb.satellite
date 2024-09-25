@@ -37,11 +37,10 @@ kwb.python::conda_py_install("ad4gd", pkgs = list(conda = c("python=3.12.2",
 
 ```
 
-## Use
+## Case Study Berlin
 
 ### Get Lakes 
 
-#### Lakes Berlin
 
 ```{r lakes_berlin}
 library(magrittr)
@@ -62,7 +61,82 @@ lakes_berlin <- sf::read_sf("lakes_berlin/Gewaesser_Berlin_Flaechen.shp",
 
 ```
 
-#### Lakes Brandenburg
+### Get Satellite Data
+
+#### Multi Core
+
+```{r satellite_data_multi, eval = ! is_gh_actions}
+reticulate::use_condaenv("ad4gd")
+library(rgee)
+rgee::ee_Initialize()
+
+
+shp_path <- system.file("extdata/berlin/Berlin_points.shp", package = "kwb.satellite")
+shp_path <- fs::path_abs("../inst/extdata/berlin/Berlin_points.shp")
+
+lakes_malte <- sf::read_sf(shp_path) %>% 
+  sf::st_transform(crs = 4326)
+
+years <- 2017:2023
+#kwb.utils::hsOpenWindowsExplorer(exp_dir)
+
+exp_dir <- fs::path_join(c(getwd(), "../vignettes/gee/lakes-berlin_point-malte"))
+fs::dir_create(exp_dir)
+
+system.time(
+lakes_malte_points_parallel <- kwb.satellite::gee_get_data_for_years_parallel(
+  years = years,
+  lakes = lakes_malte,
+  point_on_surface = FALSE,
+  spatial_fun = "mean",
+  col_lakename = "GEWNAME",
+  col_lakeid = "GEWRNEU",
+  debug_dir = exp_dir,
+  export_dir = exp_dir,
+  debug = TRUE)
+)
+
+lakes_selected <- lakes_berlin  %>% 
+  dplyr::filter(SEE_KZ %in% lakes_malte$SCHLUESSEL)
+
+exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/lakes-berlin_point-on-surface"))
+fs::dir_create(exp_dir)
+
+system.time(
+lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
+  years = years,
+  lakes = lakes_selected,
+  point_on_surface = TRUE,
+  spatial_fun = "mean",
+  col_lakename = "GEWNAME",
+  col_lakeid = "GEWRNEU",
+  debug_dir = exp_dir, 
+  export_dir = exp_dir,
+  debug = TRUE)
+)
+
+exp_dir <- fs::path_join(c(getwd(), "../vignettes/gee/lakes-berlin_polygon"))
+fs::dir_create(exp_dir)
+
+system.time(
+lakes_bb_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
+  years = years,
+  lakes = lakes_selected,
+  point_on_surface = FALSE,
+  spatial_fun = "mean",
+  col_lakename = "GEWNAME",
+  col_lakeid = "GEWRNEU",
+  debug_dir = exp_dir, 
+  export_dir = exp_dir,
+  debug = TRUE)
+)
+
+```
+
+
+## Brandenburg
+
+### Get Lakes 
 
 ```{r lakes_brandenburg}
 archive::archive_extract("https://data.geobasis-bb.de/geofachdaten/Wasser/Hydrologie/seen25.zip", 
@@ -192,82 +266,6 @@ system.time(
 lakes_bb_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
   years = years,
   lakes = lakes_selected,
-  point_on_surface = FALSE,
-  spatial_fun = "mean",
-  col_lakename = "SEE_NAME",
-  debug_dir = exp_dir, 
-  export_dir = exp_dir,
-  debug = TRUE)
-)
-
-exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/berlin_point"))
-fs::dir_create(exp_dir)
-
-system.time(
-lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
-  years = years,
-  lakes = lakes_selected,
-  point_on_surface = TRUE,
-  spatial_fun = "mean",
-  col_lakename = "SEE_NAME",
-  debug_dir = exp_dir, 
-  export_dir = exp_dir,
-  debug = TRUE)
-)
-
-exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/berlin_polygon"))
-fs::dir_create(exp_dir)
-
-system.time(
-lakes_bb_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
-  years = years,
-  lakes = lakes_selected,
-  point_on_surface = FALSE,
-  spatial_fun = "mean",
-  col_lakename = "SEE_NAME",
-  debug_dir = exp_dir, 
-  export_dir = exp_dir,
-  debug = TRUE)
-)
-
-exp_dir <- fs::path_join(c(getwd(), "gee/lakes-bb-selected_point-on-surface"))
-
-fs::dir_create(exp_dir)
-
-system.time(
-lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
-  years = years,
-  lakes = lakes_bb_selected[lakes_bb_selected$SEE_NAME == "Heiliger See",],
-  point_on_surface = TRUE,
-  spatial_fun = "mean",
-  col_lakename = "SEE_NAME",
-  debug_dir = exp_dir, 
-  export_dir = exp_dir,
-  debug = TRUE)
-)
-
-exp_dir <- fs::path_join(c(getwd(), "gee/lakes_bb_selected_polygon"))
-fs::dir_create(exp_dir)
-                           
-system.time(
-lakes_polygon <- kwb.satellite::gee_get_data_for_years_parallel(
-  years = years,
-  lakes = lakes_bb_selected,
-  point_on_surface = FALSE,
-  spatial_fun = "mean",
-  col_lakename = "SEE_NAME",
-  debug_dir = exp_dir, 
-  export_dir = exp_dir,
-  debug = TRUE)
-)
-
-exp_dir <- fs::path_join(c(getwd(), "gee/lakes-bb-selected-points_point"))
-fs::dir_create(exp_dir)
-
-system.time(
-lakes_points <- kwb.satellite::gee_get_data_for_years_parallel(
-  years = years,
-  lakes = lakes_bb_selected_points,
   point_on_surface = FALSE,
   spatial_fun = "mean",
   col_lakename = "SEE_NAME",
