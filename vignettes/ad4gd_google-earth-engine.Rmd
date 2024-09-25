@@ -75,7 +75,7 @@ shp_path <- system.file("extdata/berlin/Berlin_points.shp", package = "kwb.satel
 #shp_path <- fs::path_abs("../inst/extdata/berlin/Berlin_points.shp")
 
 lakes_malte <- sf::read_sf(shp_path) %>% 
-  sf::st_transform(crs = 4326)
+  sf::st_transform(crs = 4326) 
 
 years <- 2017:2023
 #kwb.utils::hsOpenWindowsExplorer(exp_dir)
@@ -89,8 +89,8 @@ lakes_malte_points_parallel <- kwb.satellite::gee_get_data_for_years_parallel(
   lakes = lakes_malte,
   point_on_surface = FALSE,
   spatial_fun = "mean",
-  col_lakename = "GEWNAME",
-  col_lakeid = "GEWRNEU",
+  col_lakename = "GEW_NAME",
+  col_lakeid = "GEW_NR_NEU",
   debug_dir = exp_dir,
   export_dir = exp_dir,
   debug = TRUE)
