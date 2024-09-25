@@ -65,7 +65,7 @@ lakes_berlin <- sf::read_sf("lakes_berlin/Gewaesser_Berlin_Flaechen.shp",
 
 #### Multi Core
 
-```{r satellite_data_multi, eval = ! is_gh_actions}
+```{r berlin_satellite_data_multi, eval = ! is_gh_actions}
 reticulate::use_condaenv("ad4gd")
 library(rgee)
 rgee::ee_Initialize()
@@ -162,7 +162,7 @@ lakes_bb_selected_points <- sf::read_sf(shp_path) %>%
 ### Get Satellite Data
 
 #### Single Core
-```{r satellite_data_single, eval = ! is_gh_actions}
+```{r bb_satellite_data_single, eval = ! is_gh_actions}
 
 plot_solar_azimut_angle <- function(res) {
 
@@ -212,7 +212,7 @@ plot_solar_azimut_angle(lakes_malte_test_flatten)
 
 #### Multi Core
 
-```{r satellite_data_multi, eval = ! is_gh_actions}
+```{r bb_satellite_data_multi, eval = ! is_gh_actions}
 reticulate::use_condaenv("ad4gd")
 library(rgee)
 rgee::ee_Initialize()
