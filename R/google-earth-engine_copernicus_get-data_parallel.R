@@ -99,7 +99,7 @@ gee_get_data_for_years_parallel <- function(
     lake_name <- lakes[[col_lakename]][idx]
 
     lake_idx <- if(is.null(lake_name)) {
-      sprintf(paste0("%0", nchar(nrow(lakes_bb_selected)), "d_"), idx)
+      sprintf(paste0("%0", nchar(nrow(lakes)), "d_"), idx)
     } else {
       ""
     }
