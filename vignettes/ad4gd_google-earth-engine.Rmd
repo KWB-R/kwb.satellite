@@ -65,14 +65,14 @@ lakes_berlin <- sf::read_sf("lakes_berlin/Gewaesser_Berlin_Flaechen.shp",
 
 #### Multi Core
 
-```{r berlin_satellite_data_multi, eval = ! is_gh_actions}
+```{r satellite_data_multi, eval = ! is_gh_actions}
 reticulate::use_condaenv("ad4gd")
 library(rgee)
 rgee::ee_Initialize()
 
 
 shp_path <- system.file("extdata/berlin/Berlin_points.shp", package = "kwb.satellite")
-shp_path <- fs::path_abs("../inst/extdata/berlin/Berlin_points.shp")
+#shp_path <- fs::path_abs("../inst/extdata/berlin/Berlin_points.shp")
 
 lakes_malte <- sf::read_sf(shp_path) %>% 
   sf::st_transform(crs = 4326)
@@ -80,7 +80,7 @@ lakes_malte <- sf::read_sf(shp_path) %>%
 years <- 2017:2023
 #kwb.utils::hsOpenWindowsExplorer(exp_dir)
 
-exp_dir <- fs::path_join(c(getwd(), "../vignettes/gee/lakes-berlin_point-malte"))
+exp_dir <- fs::path_join(c(getwd(), "../vignettes/gee/lakes-berlin_point-malte")) %>%  fs::path_abs()
 fs::dir_create(exp_dir)
 
 system.time(
@@ -99,7 +99,7 @@ lakes_malte_points_parallel <- kwb.satellite::gee_get_data_for_years_parallel(
 lakes_selected <- lakes_berlin  %>% 
   dplyr::filter(SEE_KZ %in% lakes_malte$SCHLUESSEL)
 
-exp_dir <- fs::path_join(c(getwd(), "vignettes/gee/lakes-berlin_point-on-surface"))
+exp_dir <- fs::path_join(c(getwd(), "../vignettes/gee/lakes-berlin_point-on-surface")) %>% fs::path_abs()
 fs::dir_create(exp_dir)
 
 system.time(
@@ -115,7 +115,7 @@ lakes_bb_point_on_surface <- kwb.satellite::gee_get_data_for_years_parallel(
   debug = TRUE)
 )
 
-exp_dir <- fs::path_join(c(getwd(), "../vignettes/gee/lakes-berlin_polygon"))
+exp_dir <- fs::path_join(c(getwd(), "../vignettes/gee/lakes-berlin_polygon")) %>% fs::path_abs()
 fs::dir_create(exp_dir)
 
 system.time(
@@ -162,7 +162,7 @@ lakes_bb_selected_points <- sf::read_sf(shp_path) %>%
 ### Get Satellite Data
 
 #### Single Core
-```{r bb_satellite_data_single, eval = ! is_gh_actions}
+```{r satellite_data_single, eval = ! is_gh_actions}
 
 plot_solar_azimut_angle <- function(res) {
 
@@ -212,7 +212,7 @@ plot_solar_azimut_angle(lakes_malte_test_flatten)
 
 #### Multi Core
 
-```{r bb_satellite_data_multi, eval = ! is_gh_actions}
+```{r satellite_data_multi, eval = ! is_gh_actions}
 reticulate::use_condaenv("ad4gd")
 library(rgee)
 rgee::ee_Initialize()
